@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { showToast } from '../../../utils/toast';
 
@@ -9,7 +9,7 @@ function getStored(key) {
   try { return localStorage.getItem(key); } catch (_) { return null; }
 }
 
-export default function AdminNewUser() {
+function AdminNewUserContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const roleParam = searchParams.get('role');
@@ -110,5 +110,13 @@ export default function AdminNewUser() {
         </form>
       </section>
     </>
+  );
+}
+
+export default function AdminNewUserPage() {
+  return (
+    <Suspense fallback={<p style={{ padding: 24 }}><i className="fas fa-spinner fa-spin"></i> Loading...</p>}>
+      <AdminNewUserContent />
+    </Suspense>
   );
 }

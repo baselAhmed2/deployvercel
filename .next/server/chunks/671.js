@@ -1,0 +1,1 @@
+"use strict";exports.id=671,exports.ids=[671],exports.modules={671:(r,e,s)=>{s.r(e),s.d(e,{default:()=>d});var t=s(997),o=s(4661);function d({Component:r,pageProps:e}){return t.jsx(o.BrowserRouter,{children:t.jsx(r,{...e})})}}};
