@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forgot Password - Capital University</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+  <div class="background">
+    <div class="background-image"></div>
+    <div class="background-overlay"></div>
+  </div>
+
+  <main class="login-wrapper">
+    <div class="login-card">
+      <div class="card-header">
+        <div class="logo">
+          <img src="../imgs/image (5).png" alt="Capital University" class="logo-img" />
+        </div>
+        <h1 class="university-name">Capital University</h1>
+        <p class="portal-title">Reset Your Password</p>
+      </div>
+
+      <form class="login-form" id="reset-form">
+        <div class="input-group">
+          <i class="fas fa-user input-icon"></i>
+          <input type="text" id="studentId" name="studentId" placeholder="Student ID" autocomplete="username" required />
+        </div>
+        <div class="input-group">
+          <i class="fas fa-envelope input-icon"></i>
+          <input type="email" id="email" name="email" placeholder="Email" autocomplete="email" required />
+        </div>
+        <div class="input-group">
+          <i class="fas fa-id-card input-icon"></i>
+          <input type="text" id="nationalId" name="nationalId" placeholder="National ID" autocomplete="off" required />
+        </div>
+
+        <button type="submit" class="sign-in-btn">
+          Reset Password
+          <i class="fas fa-key"></i>
+        </button>
+
+        <a href="../index.html" class="back-to-login">Back to Sign In</a>
+      </form>
+    </div>
+  </main>
+
+  <footer class="page-footer">
+    © 2026 Capital University. All rights reserved.
+  </footer>
+  <script src="../../api.config.js"></script>
+  <script src="../../api.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

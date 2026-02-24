@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ticket# 2026-IE123 - TICKET LEAD</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-left">
+      <button type="button" class="sidebar-toggle" aria-label="Open menu">
+        <i class="fas fa-bars"></i>
+      </button>
+      <span class="brand">TICKET LEAD</span>
+      <span class="welcome-text">Welcome!</span>
+    </div>
+    <div class="header-right">
+      <img src="https://ui-avatars.com/api/?name=Alex+Robert&background=6f42c1&color=fff" alt="" class="user-avatar" />
+      <span class="user-name">Alex Robert</span>
+      <button type="button" class="user-menu-btn" aria-label="User menu">
+        <i class="fas fa-chevron-down"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
+  <div class="app-body">
+    <aside class="sidebar" id="sidebar" aria-hidden="true">
+      <div class="sidebar-header">
+        <span class="brand">TICKET LEAD</span>
+        <button type="button" class="sidebar-close" aria-label="Close menu">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <nav>
+        <ul class="nav-list">
+          <li class="nav-item">
+            <a href="index.html" class="nav-link">
+              <i class="fas fa-th-large"></i>
+              Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="new-ticket.html" class="nav-link active">
+              <i class="fas fa-ticket-alt"></i>
+              New Ticket
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="../login/index.html" class="nav-link">
+              <i class="fas fa-sign-out-alt"></i>
+              Logout
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <div class="app-layout">
+    <main class="main-content">
+      <h1 class="page-title">Tickets</h1>
+
+      <div class="detail-card">
+        <div class="detail-header">
+          <span class="ticket-status-dot orange"></span>
+          <span class="ticket-id">Ticket# 2026-IE123</span>
+          <span class="detail-category">Classwork Issue</span>
+          <span class="ticket-time" style="margin-left: auto;">Posted at 12:45 - 3-2026</span>
+        </div>
+        <h2 class="ticket-subject" style="margin-bottom: 12px;">How to deposit money to my portal?</h2>
+        <div class="detail-body">
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+          <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <button type="button" class="collapsible-header" aria-expanded="true" aria-controls="sender-info">
+          Ticket Sender Information
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div id="sender-info">
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Student ID</label>
+              <span class="value">512393207</span>
+            </div>
+            <div class="info-item">
+              <label>Student Name</label>
+              <span class="value">Basel Ahmed</span>
+            </div>
+            <div class="info-item">
+              <label>Course</label>
+              <span class="value"><span class="legend-dot orange" style="display: inline-block; vertical-align: middle; margin-right: 4px;"></span> Information Economy</span>
+            </div>
+            <div class="info-item">
+              <label>Group Number</label>
+              <span class="value">9</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <h2 class="section-title" style="margin-bottom: 12px;">Last Replays On Ticket</h2>
+        <div class="reply-list">
+          <div class="reply-item">
+            <div class="reply-meta">You on 12-11-2024</div>
+            <div class="reply-text">Massage Text – previous reply content from the student.</div>
+          </div>
+          <div class="reply-item">
+            <div class="reply-meta">Receiver on 13-11-2024</div>
+            <div class="reply-text">Massage Text – previous reply content from the doctor/staff.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <h2 class="section-title" style="margin-bottom: 16px;">Reply to Ticket</h2>
+        <form id="reply-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Token ID</label>
+              <input type="text" class="form-input" value="512393207" readonly />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Request Ticket Type</label>
+              <select class="form-select" name="type">
+                <option value="deposit" selected>Deposit Issue</option>
+                <option value="classwork">Classwork Issue</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select class="form-select" name="status">
+                <option value="ongoing" selected>On-Going</option>
+                <option value="resolved">Resolved</option>
+              </select>
+            </div>
+            <div class="form-group full-width">
+              <label class="form-label">Ticket Body</label>
+              <textarea class="form-textarea" name="body" placeholder="Type ticket issue here.." required></textarea>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">Submit</button>
+          </div>
+        </form>
+      </div>
+    </main>
+    </div>
+  </div>
+
+  <script>window.ticketIdFromPage = new URLSearchParams(window.location.search).get('id') || '2026-IE123';</script>
+  <script src="../api.config.js"></script>
+  <script src="../api.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
