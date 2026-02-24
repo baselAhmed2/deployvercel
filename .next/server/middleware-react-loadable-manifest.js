@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{}"
+self.__REACT_LOADABLE_MANIFEST='{"pages\\\\_app.js -> ../components/ClientRouter":{"id":671,"files":["static/chunks/bab45348-6c64e3a8713bef8e.js","static/chunks/671.7f7c249e59bd040b.js"]}}';

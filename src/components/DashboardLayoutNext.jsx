@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { TicketAPI } from '../lib/api';
 
 function getStored(key) {
   if (typeof window === 'undefined') return null;
@@ -11,7 +12,27 @@ function getStored(key) {
 
 export default function DashboardLayoutNext({ userDisplayName = 'Alex Robert', userAvatarName, navItems, sidebarFooter, children }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [authorized, setAuthorized] = useState(false);
+
+  useEffect(() => {
+    const token = getStored('token');
+    if (!token) {
+      router.replace('/');
+      return;
+    }
+    setAuthorized(true);
+  }, [router]);
+
+  if (!authorized) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12, fontFamily: 'sans-serif' }}>
+        <p style={{ color: '#666' }}>Checking authorization...</p>
+        <p style={{ fontSize: '0.9rem', color: '#999' }}>Redirecting to login if not authenticated</p>
+      </div>
+    );
+  }
   const displayName = getStored('userName') || userDisplayName;
   const avatarName = userAvatarName || displayName;
   const userRole = getStored('userRole');
@@ -93,7 +114,12 @@ export default function DashboardLayoutNext({ userDisplayName = 'Alex Robert', u
                   <Link
                     href={item.href}
                     className={isActive(item.href, item.end) ? 'nav-link active' : 'nav-link'}
-                    onClick={closeSidebar}
+                    onClick={(e) => {
+                      closeSidebar();
+                      if (item.label === 'Logout' && TicketAPI.clearAuth) {
+                        TicketAPI.clearAuth();
+                      }
+                    }}
                   >
                     <i className={item.icon}></i>
                     {item.label}
@@ -105,18 +131,23 @@ export default function DashboardLayoutNext({ userDisplayName = 'Alex Robert', u
           {sidebarFooter && (
             <div className="sidebar-footer">
               <ul className="nav-list">
-                {sidebarFooter.map((item) => (
-                  <li key={item.href} className="nav-item">
-                    <Link
-                      href={item.href}
-                      className={isActive(item.href, item.end) ? 'nav-link active' : 'nav-link'}
-                      onClick={closeSidebar}
-                    >
-                      <i className={item.icon}></i>
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
+              {sidebarFooter.map((item) => (
+                <li key={item.href} className="nav-item">
+                  <Link
+                    href={item.href}
+                    className={isActive(item.href, item.end) ? 'nav-link active' : 'nav-link'}
+                    onClick={(e) => {
+                      closeSidebar();
+                      if (item.label === 'Logout' && TicketAPI.clearAuth) {
+                        TicketAPI.clearAuth();
+                      }
+                    }}
+                  >
+                    <i className={item.icon}></i>
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
               </ul>
             </div>
           )}

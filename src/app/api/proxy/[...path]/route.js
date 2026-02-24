@@ -1,4 +1,4 @@
-const BACKEND = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.API_BACKEND_URL || 'http://bistest.runasp.net';
+const BACKEND = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.API_BACKEND_URL || 'https://bistest.runasp.net';
 
 export const dynamic = 'force-dynamic';
 

@@ -8,7 +8,7 @@ export const doctorNav = [
   { href: '/doctor', label: 'Dashboard', icon: 'fas fa-th-large', end: true },
   { href: '/doctor/my-courses', label: 'My Courses', icon: 'fas fa-book' },
   { href: '/doctor/tickets', label: 'Tickets', icon: 'fas fa-ticket-alt' },
-  { href: '/?role=doctor', label: 'Logout', icon: 'fas fa-sign-out-alt', end: true },
+  { href: '/', label: 'Logout', icon: 'fas fa-sign-out-alt', end: true },
 ];
 
 export const adminNav = [
@@ -18,7 +18,7 @@ export const adminNav = [
   { href: '/administrator/add-subject', label: 'Add Subject', icon: 'fas fa-book-open' },
   { href: '/administrator/add-course', label: 'Assign Subjects to Doctor', icon: 'fas fa-user-plus' },
   { href: '/administrator/analysis', label: 'Analysis', icon: 'fas fa-chart-bar' },
-  { href: '/?role=administrator', label: 'Logout', icon: 'fas fa-sign-out-alt', end: true },
+  { href: '/', label: 'Logout', icon: 'fas fa-sign-out-alt', end: true },
 ];
 
 export const adminSidebarFooter = [
