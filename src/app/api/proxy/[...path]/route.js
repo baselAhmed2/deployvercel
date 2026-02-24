@@ -36,7 +36,9 @@ async function proxyRequest(request, pathSegments, method) {
       }
     });
 
-    const options = { method, headers, cache: 'no-store' };
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
+    const options = { method, headers, cache: 'no-store', signal: controller.signal };
     if (method !== 'GET' && method !== 'HEAD') {
       try {
         const body = await request.text();
@@ -45,6 +47,7 @@ async function proxyRequest(request, pathSegments, method) {
     }
 
     const res = await fetch(backendUrl, options);
+    clearTimeout(timeoutId);
     const data = await res.text();
     const contentType = res.headers.get('content-type') || 'application/json';
 
