@@ -93,9 +93,10 @@ export const TicketAPI = {
       body: JSON.stringify({ ticketId, body }),
     });
   },
-  getAdminUsers(pageIndex = 1, pageSize = 10, searchTerm = '') {
+  getAdminUsers(pageIndex = 1, pageSize = 10, searchTerm = '', role = null) {
     const params = new URLSearchParams({ pageIndex, pageSize });
     if (searchTerm) params.set('searchTerm', searchTerm);
+    if (role) params.set('role', role);
     return request(`/api/Admin/users?${params}`);
   },
   getAdminUserById(userId) {

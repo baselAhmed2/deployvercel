@@ -47,20 +47,52 @@ function AdminUsersContent() {
       setError('API is not available.');
       return;
     }
+    const pageSize = 10;
+    const search = searchInput.trim();
     setLoading(true);
     setError('');
-    window.TicketAPI.getAdminUsers(pageParam, 10, searchInput.trim())
-      .then((res) => {
-        const data = res?.data ?? res?.Data ?? [];
-        let items = Array.isArray(data) ? data : [];
-        if (filterParam === 'students') items = items.filter((u) => ((u.role ?? u.Role) ?? '').toLowerCase() === 'student');
-        else if (filterParam === 'doctors') items = items.filter((u) => ((u.role ?? u.Role) ?? '').toLowerCase() === 'doctor');
-        else if (filterParam === 'admins') items = items.filter((u) => { const r = ((u.role ?? u.Role) ?? '').toLowerCase(); return r === 'superadmin' || r === 'subadmin'; });
-        setUsers(items);
-        setPagination({ totalPages: res?.totalPages ?? res?.TotalPages ?? 1 });
-      })
-      .catch((err) => setError((err && err.message) ? err.message : 'Failed to load users.'))
-      .finally(() => setLoading(false));
+
+    // الباك إند يدعم دور واحد فقط — فلتر Admins يحتاج استدعاءين (SuperAdmin + SubAdmin) ثم دمج النتائج
+    const isAdminsFilter = filterParam === 'admins';
+    const roleParam = filterParam === 'students' ? 'Student' : filterParam === 'doctors' ? 'Doctor' : null;
+    const adminsPageSize = 10; // عدد المستخدمين لكل دور في الصفحة
+
+    if (isAdminsFilter) {
+      Promise.all([
+        window.TicketAPI.getAdminUsers(pageParam, adminsPageSize, search, 'SuperAdmin'),
+        window.TicketAPI.getAdminUsers(pageParam, adminsPageSize, search, 'SubAdmin'),
+      ])
+        .then(([res1, res2]) => {
+          const data1 = res1?.data ?? res1?.Data ?? [];
+          const data2 = res2?.data ?? res2?.Data ?? [];
+          const items1 = Array.isArray(data1) ? data1 : [];
+          const items2 = Array.isArray(data2) ? data2 : [];
+          const merged = [...items1, ...items2];
+          const totalCount1 = res1?.totalCount ?? res1?.TotalCount ?? 0;
+          const totalCount2 = res2?.totalCount ?? res2?.TotalCount ?? 0;
+          const totalCount = totalCount1 + totalCount2;
+          // كل صفحة تعرض حتى 20 أدمن (10 SuperAdmin + 10 SubAdmin)
+          const adminsPerPage = adminsPageSize * 2;
+          const totalPages = Math.max(1, Math.ceil(totalCount / adminsPerPage));
+          setUsers(merged);
+          setPagination({ totalPages });
+        })
+        .catch((err) => setError((err && err.message) ? err.message : 'Failed to load users.'))
+        .finally(() => setLoading(false));
+    } else {
+      window.TicketAPI.getAdminUsers(pageParam, pageSize, search, roleParam)
+        .then((res) => {
+          const data = res?.data ?? res?.Data ?? [];
+          const items = Array.isArray(data) ? data : [];
+          const totalCount = res?.totalCount ?? res?.TotalCount ?? 0;
+          const resPageSize = res?.pageSize ?? res?.PageSize ?? pageSize;
+          const totalPages = res?.totalPages ?? res?.TotalPages ?? Math.max(1, Math.ceil(totalCount / resPageSize));
+          setUsers(items);
+          setPagination({ totalPages });
+        })
+        .catch((err) => setError((err && err.message) ? err.message : 'Failed to load users.'))
+        .finally(() => setLoading(false));
+    }
   }, [pageParam, filterParam, searchInput]);
 
   const handleDeleteClick = (user) => {
