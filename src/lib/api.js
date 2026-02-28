@@ -23,8 +23,14 @@ function getAuthHeader() {
 
 function request(path, options = {}) {
   const url = getProxyUrl(path);
+
+  // If body is FormData, don't set 'Content-Type' manually
+  // so the browser can automatically set it to 'multipart/form-data; boundary=...'
+  const isFormData = options.body instanceof FormData;
+  const defaultHeaders = isFormData ? {} : { 'Content-Type': 'application/json' };
+
   return fetch(url, {
-    headers: { 'Content-Type': 'application/json', ...getAuthHeader(), ...options.headers },
+    headers: { ...defaultHeaders, ...getAuthHeader(), ...options.headers },
     ...options,
   }).then((res) => {
     if (!res.ok) {
@@ -117,6 +123,16 @@ export const TicketAPI = {
   deleteAdminUser(userId) {
     return request(`/api/Admin/users/${encodeURIComponent(userId)}`, { method: 'DELETE' });
   },
+
+  // Bulk Upload
+  bulkUploadStudents(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    return request('/api/Admin/students/bulk-upload', {
+      method: 'POST',
+      body: formData,
+    });
+  },
   getAdminFilteredTickets(filter) {
     return request('/api/Admin/tickets/filter', {
       method: 'POST',
@@ -170,8 +186,9 @@ export const TicketAPI = {
   getAdminAllTickets(pageIndex = 1, pageSize = 10) {
     return request(`/api/Tickets/all?pageIndex=${pageIndex}&pageSize=${pageSize}`);
   },
-  getAdminAnalytics() {
-    return request('/api/Analytics/admin');
+  getAdminAnalytics(period = null) {
+    const url = period ? `/api/Analytics/admin?period=${period}` : '/api/Analytics/admin';
+    return request(url);
   },
   getTopDoctors(count = 10, level = null) {
     const params = new URLSearchParams({ count });
@@ -192,6 +209,14 @@ export const TicketAPI = {
   adminRemoveSelfFromSubject(subjectId) {
     return request(`/api/Admin/subjects/${encodeURIComponent(subjectId)}/unassign-self`, { method: 'DELETE' });
   },
+  getAdminMySubjects() {
+    return request('/api/Admin/my-subjects');
+  },
+  getAdminMyDoctorTickets(pageIndex = 1, pageSize = 10, status = null) {
+    const params = new URLSearchParams({ pageIndex, pageSize });
+    if (status !== null) params.set('status', status);
+    return request(`/api/Admin/my-doctor-tickets?${params}`);
+  },
   createUser(payload) {
     return this.createAdminUser(payload);
   },
@@ -209,6 +234,6 @@ export const TicketAPI = {
       localStorage.removeItem('userRole');
       localStorage.removeItem('userProgram');
       sessionStorage.removeItem('token');
-    } catch (_) {}
+    } catch (_) { }
   },
 };

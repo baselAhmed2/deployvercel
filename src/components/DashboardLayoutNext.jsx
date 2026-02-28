@@ -87,9 +87,6 @@ export default function DashboardLayoutNext({ userDisplayName = 'Alex Robert', u
             className="user-avatar"
           />
           <span className="user-name">{displayName}</span>
-          <button type="button" className="user-menu-btn" aria-label="User menu">
-            <i className="fas fa-chevron-down"></i>
-          </button>
         </div>
       </header>
 
@@ -100,9 +97,8 @@ export default function DashboardLayoutNext({ userDisplayName = 'Alex Robert', u
       />
 
       <div className="app-body">
-        <aside className="sidebar" id="sidebar" aria-hidden={!sidebarOpen}>
+        <aside className={`sidebar${sidebarOpen ? ' open' : ''}`} id="sidebar" aria-hidden={!sidebarOpen}>
           <div className="sidebar-header">
-            <span className="brand">TICKET LEAD</span>
             <button type="button" className="sidebar-close" aria-label="Close menu" onClick={closeSidebar}>
               <i className="fas fa-times"></i>
             </button>
@@ -113,7 +109,10 @@ export default function DashboardLayoutNext({ userDisplayName = 'Alex Robert', u
                 <li key={item.href} className="nav-item">
                   <Link
                     href={item.href}
-                    className={isActive(item.href, item.end) ? 'nav-link active' : 'nav-link'}
+                    className={[
+                      isActive(item.href, item.end) ? 'nav-link active' : 'nav-link',
+                      item.danger ? 'danger' : '',
+                    ].filter(Boolean).join(' ')}
                     onClick={(e) => {
                       closeSidebar();
                       if (item.label === 'Logout' && TicketAPI.clearAuth) {
@@ -131,23 +130,26 @@ export default function DashboardLayoutNext({ userDisplayName = 'Alex Robert', u
           {sidebarFooter && (
             <div className="sidebar-footer">
               <ul className="nav-list">
-              {sidebarFooter.map((item) => (
-                <li key={item.href} className="nav-item">
-                  <Link
-                    href={item.href}
-                    className={isActive(item.href, item.end) ? 'nav-link active' : 'nav-link'}
-                    onClick={(e) => {
-                      closeSidebar();
-                      if (item.label === 'Logout' && TicketAPI.clearAuth) {
-                        TicketAPI.clearAuth();
-                      }
-                    }}
-                  >
-                    <i className={item.icon}></i>
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
+                {sidebarFooter.map((item) => (
+                  <li key={item.href} className="nav-item">
+                    <Link
+                      href={item.href}
+                      className={[
+                        isActive(item.href, item.end) ? 'nav-link active' : 'nav-link',
+                        item.danger ? 'danger' : '',
+                      ].filter(Boolean).join(' ')}
+                      onClick={(e) => {
+                        closeSidebar();
+                        if (item.label === 'Logout' && TicketAPI.clearAuth) {
+                          TicketAPI.clearAuth();
+                        }
+                      }}
+                    >
+                      <i className={item.icon}></i>
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
           )}

@@ -20,6 +20,7 @@ import AdminUsers from './pages/administrator/AdminUsers';
 import AdminUserDetail from './pages/administrator/AdminUserDetail';
 import AdminNewUser from './pages/administrator/AdminNewUser';
 import AdminAddCourse from './pages/administrator/AdminAddCourse';
+import AdminAssignToDoctor from './pages/administrator/AdminAssignToDoctor';
 import AdminAnalysis from './pages/administrator/AdminAnalysis';
 import AdminSiteSettings from './pages/administrator/AdminSiteSettings';
 
@@ -41,6 +42,7 @@ const adminNav = [
   { to: '/administrator/tickets', label: 'Tickets', icon: 'fas fa-ticket-alt' },
   { to: '/administrator/users', label: 'Users', icon: 'fas fa-users' },
   { to: '/administrator/add-course', label: 'Add Course', icon: 'fas fa-book' },
+  { to: '/administrator/assign-to-doctor', label: 'Assign to Doctor', icon: 'fas fa-user-md' },
   { to: '/administrator/analysis', label: 'Analysis', icon: 'fas fa-chart-bar' },
   { to: '/?role=administrator', label: 'Logout', icon: 'fas fa-sign-out-alt' },
 ];
@@ -84,6 +86,7 @@ export default function App() {
           <Route path="users/:id" element={<AdminUserDetail />} />
           <Route path="new-user" element={<AdminNewUser />} />
           <Route path="add-course" element={<AdminAddCourse />} />
+          <Route path="assign-to-doctor" element={<AdminAssignToDoctor />} />
           <Route path="analysis" element={<AdminAnalysis />} />
           <Route path="site-settings" element={<AdminSiteSettings />} />
         </Route>

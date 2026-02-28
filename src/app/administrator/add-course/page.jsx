@@ -33,16 +33,29 @@ export default function AdminAddCourse() {
     }
     const api = window.TicketAPI;
     Promise.all([
-      api.getAdminUsers ? api.getAdminUsers(1, 200).then((r) => (r?.data ?? r?.Data ?? []).filter((u) => ((u.role ?? u.Role) ?? '').toLowerCase() === 'doctor')) : Promise.resolve([]),
+      // Doctors
+      api.getAdminUsers ? api.getAdminUsers(1, 200, '', 'Doctor').then((r) => (r?.data ?? r?.Data ?? [])) : Promise.resolve([]),
+      // SuperAdmins
+      api.getAdminUsers ? api.getAdminUsers(1, 100, '', 'SuperAdmin').then((r) => (r?.data ?? r?.Data ?? [])) : Promise.resolve([]),
+      // SubAdmins
+      api.getAdminUsers ? api.getAdminUsers(1, 100, '', 'SubAdmin').then((r) => (r?.data ?? r?.Data ?? [])) : Promise.resolve([]),
+      // All subjects
       api.getAdminSubjects ? api.getAdminSubjects() : Promise.resolve([]),
     ])
-      .then(([usersRes, subs]) => {
-        setDoctors(Array.isArray(usersRes) ? usersRes : []);
+      .then(([doctors, superAdmins, subAdmins, subs]) => {
+        // Merge all — دكاترة أولاً ثم أدمن (مع label واضح)
+        const allDoctors = [
+          ...doctors.map((u) => ({ ...u, _roleLabel: 'Doctor' })),
+          ...superAdmins.map((u) => ({ ...u, _roleLabel: 'SuperAdmin' })),
+          ...subAdmins.map((u) => ({ ...u, _roleLabel: 'SubAdmin' })),
+        ];
+        setDoctors(Array.isArray(allDoctors) ? allDoctors : []);
         setSubjects(Array.isArray(subs) ? subs : []);
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
   }, []);
+
 
   useEffect(() => {
     if (!doctorId || typeof window.TicketAPI === 'undefined' || !window.TicketAPI.getAdminDoctorSubjects) {
@@ -100,11 +113,11 @@ export default function AdminAddCourse() {
 
   const filteredDoctors = searchDoctor.trim()
     ? doctors.filter((d) => {
-        const n = (d.name ?? d.Name ?? d.userName ?? d.UserName ?? '').toLowerCase();
-        const i = (d.id ?? d.Id ?? '').toLowerCase();
-        const q = searchDoctor.toLowerCase();
-        return n.includes(q) || i.includes(q);
-      })
+      const n = (d.name ?? d.Name ?? d.userName ?? d.UserName ?? '').toLowerCase();
+      const i = (d.id ?? d.Id ?? '').toLowerCase();
+      const q = searchDoctor.toLowerCase();
+      return n.includes(q) || i.includes(q);
+    })
     : doctors;
 
   if (loading) {
@@ -144,7 +157,10 @@ export default function AdminAddCourse() {
               const did = d.id ?? d.Id;
               const dname = d.name ?? d.Name ?? d.userName ?? d.UserName;
               const prog = d.program ?? d.Program ?? '';
-              return <option key={did} value={did}>{dname} ({did}) {prog ? `— ${prog}` : ''}</option>;
+              const roleLabel = d._roleLabel ?? (d.role ?? d.Role ?? 'Doctor');
+              const isAdmin = roleLabel === 'SuperAdmin' || roleLabel === 'SubAdmin';
+              const prefix = isAdmin ? `[${roleLabel}] ` : '';
+              return <option key={did} value={did}>{prefix}{dname} ({did}){prog ? ` — ${prog}` : ''}</option>;
             })}
           </select>
         </div>
@@ -166,7 +182,18 @@ export default function AdminAddCourse() {
               style={{ borderRadius: '50%', width: 40, height: 40 }}
             />
             <div>
-              <strong style={{ fontSize: '1rem' }}>{selectedDoctorName}</strong>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <strong style={{ fontSize: '1rem' }}>{selectedDoctorName}</strong>
+                {(() => {
+                  const rl = selectedDoctor._roleLabel ?? (selectedDoctor.role ?? selectedDoctor.Role ?? '');
+                  const isAdmin = rl === 'SuperAdmin' || rl === 'SubAdmin';
+                  return isAdmin ? (
+                    <span style={{ fontSize: '0.72rem', background: '#6f42c1', color: '#fff', borderRadius: 8, padding: '2px 8px', fontWeight: 600 }}>
+                      {rl}
+                    </span>
+                  ) : null;
+                })()}
+              </div>
               <div style={{ fontSize: '0.85rem', color: '#6b21a8' }}>
                 ID: {doctorId} {(selectedDoctor.program ?? selectedDoctor.Program) ? `— ${selectedDoctor.program ?? selectedDoctor.Program}` : ''}
               </div>
@@ -236,7 +263,7 @@ export default function AdminAddCourse() {
                       const sProgram = s.program ?? s.Program ?? '';
                       const checked = subjectIds.includes(sid);
                       return (
-                        <label
+                        <div
                           key={sid}
                           onClick={() => toggleSubject(sid)}
                           style={{
@@ -249,13 +276,15 @@ export default function AdminAddCourse() {
                             background: checked ? ls.bg : '#fff',
                             cursor: 'pointer',
                             transition: 'all 0.15s',
+                            userSelect: 'none',
                           }}
                         >
                           <input
                             type="checkbox"
                             checked={checked}
-                            onChange={() => {}}
-                            style={{ accentColor: ls.dot, width: 16, height: 16, flexShrink: 0 }}
+                            onChange={() => toggleSubject(sid)}
+                            onClick={(e) => e.stopPropagation()}
+                            style={{ accentColor: ls.dot, width: 16, height: 16, flexShrink: 0, cursor: 'pointer' }}
                           />
                           <div style={{ minWidth: 0 }}>
                             <div style={{ fontWeight: 500, fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -265,7 +294,7 @@ export default function AdminAddCourse() {
                               {sid} — T{sTerm} {sProgram && `— ${sProgram}`}
                             </div>
                           </div>
-                        </label>
+                        </div>
                       );
                     })}
                   </div>

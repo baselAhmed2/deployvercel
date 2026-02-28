@@ -50,9 +50,33 @@ export const TicketAPI = {
   deleteAllTickets() {
     return request('/api/tickets/all', { method: 'DELETE' });
   },
+
+  // =====================
+  // Admin-as-Doctor APIs
+  // =====================
+  getAdminSubjects() {
+    if (!BASE) return Promise.resolve([]);
+    return request('/api/admin/subjects');
+  },
+  getMySubjects() {
+    if (!BASE) return Promise.resolve([]);
+    return request('/api/admin/my-subjects');
+  },
+  assignSelfToSubject(subjectId) {
+    if (!BASE) return Promise.resolve({ message: 'Assigned successfully' });
+    return request(`/api/admin/subjects/${subjectId}/assign-self`, { method: 'POST' });
+  },
+  unassignSelfFromSubject(subjectId) {
+    if (!BASE) return Promise.resolve({ message: 'Unassigned successfully' });
+    return request(`/api/admin/subjects/${subjectId}/unassign-self`, { method: 'DELETE' });
+  },
+  getMyDoctorTickets(pageIndex = 1, pageSize = 10) {
+    if (!BASE) return Promise.resolve({ data: [], totalCount: 0, pageIndex, pageSize });
+    return request(`/api/admin/my-doctor-tickets?pageIndex=${pageIndex}&pageSize=${pageSize}`);
+  },
   clearAuth() {
     // محل التخزين أو التوكن حسب تطبيقك
-    try { localStorage.removeItem('token'); sessionStorage.removeItem('token'); } catch (_) {}
+    try { localStorage.removeItem('token'); sessionStorage.removeItem('token'); } catch (_) { }
   },
 };
 

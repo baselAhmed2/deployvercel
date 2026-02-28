@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { showToast } from '../../../utils/toast';
+import BulkUploadModal from '../../../components/BulkUploadModal';
 
 const COUNTDOWN_SECONDS = 15;
 
@@ -9,7 +10,21 @@ export default function AdminSiteSettings() {
   const [phase, setPhase] = useState('idle');
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
   const [deleting, setDeleting] = useState(false);
+  const [dashboardPeriod, setDashboardPeriod] = useState('90');
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
   const timerRef = useRef(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('dashboardPeriod');
+    if (saved) setDashboardPeriod(saved);
+  }, []);
+
+  const handlePeriodChange = (e) => {
+    const val = e.target.value;
+    setDashboardPeriod(val);
+    localStorage.setItem('dashboardPeriod', val);
+    showToast('Dashboard period updated.');
+  };
 
   const clearTimer = useCallback(() => {
     if (timerRef.current) {
@@ -104,6 +119,71 @@ export default function AdminSiteSettings() {
     <>
       <h1 className="page-title">Site Settings</h1>
 
+      {/* Dashboard General Settings */}
+      <div className="detail-card" style={{ marginBottom: 24 }}>
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: '1.1rem', fontWeight: 600, color: '#343a40', marginBottom: 4 }}>
+            <i className="fas fa-tachometer-alt" style={{ color: '#6f42c1', marginRight: 8 }}></i>
+            Dashboard Performance Filter
+          </div>
+          <p style={{ margin: 0, color: '#6c757d', fontSize: '0.9rem' }}>
+            Control the time frame for data fetched on the dashboard. Selecting a shorter period greatly improves performance by excluding old tickets from the statistics.
+          </p>
+        </div>
+
+        <div className="form-group" style={{ maxWidth: 300 }}>
+          <label htmlFor="dashboardPeriod" className="form-label">Analytics Time Frame</label>
+          <select
+            id="dashboardPeriod"
+            className="form-control"
+            value={dashboardPeriod}
+            onChange={handlePeriodChange}
+          >
+            <option value="7">Last 7 Days</option>
+            <option value="30">Last 1 Month</option>
+            <option value="90">Last 3 Months</option>
+            <option value="180">Last 6 Months</option>
+            <option value="365">Last 1 Year</option>
+            <option value="all">All Time (Slowest)</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Overlay Loader */}
+      {deleting && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(255,255,255,0.85)', zIndex: 9999,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
+        }}>
+          <i className="fas fa-spinner fa-spin" style={{ fontSize: '3rem', color: '#dc3545', marginBottom: 16 }}></i>
+          <h2 style={{ color: '#dc3545', margin: 0 }}>Deleting everything...</h2>
+          <p style={{ color: '#666', marginTop: 8 }}>Please do not close this window.</p>
+        </div>
+      )}
+
+      {/* Bulk Upload Settings */}
+      <div className="detail-card" style={{ marginBottom: 24 }}>
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: '1.1rem', fontWeight: 600, color: '#343a40', marginBottom: 4 }}>
+            <i className="fas fa-file-excel" style={{ color: '#28a745', marginRight: 8 }}></i>
+            Students Bulk Management
+          </div>
+          <p style={{ margin: 0, color: '#6c757d', fontSize: '0.9rem' }}>
+            Upload an Excel file to quickly insert new students or update existing ones in the system.
+          </p>
+        </div>
+
+        <button
+          className="btn-primary"
+          onClick={() => setIsUploadOpen(true)}
+          style={{ background: '#28a745', borderColor: '#28a745' }}
+        >
+          <i className="fas fa-upload" style={{ marginRight: 8 }}></i> Open Bulk Upload
+        </button>
+      </div>
+
+      {/* Danger Zone */}
       <div className="detail-card danger-card">
         <div>
           <div className="danger-card-title">
@@ -199,6 +279,11 @@ export default function AdminSiteSettings() {
           </div>
         )}
       </div>
+
+      <BulkUploadModal
+        isOpen={isUploadOpen}
+        onClose={() => setIsUploadOpen(false)}
+      />
     </>
   );
 }

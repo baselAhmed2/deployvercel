@@ -31,9 +31,6 @@ export default function DashboardLayout({ userDisplayName = 'Alex Robert', userA
             className="user-avatar"
           />
           <span className="user-name">{userDisplayName}</span>
-          <button type="button" className="user-menu-btn" aria-label="User menu">
-            <i className="fas fa-chevron-down"></i>
-          </button>
         </div>
       </header>
 
@@ -44,9 +41,8 @@ export default function DashboardLayout({ userDisplayName = 'Alex Robert', userA
       />
 
       <div className="app-body">
-        <aside className="sidebar" id="sidebar" aria-hidden={!sidebarOpen}>
+        <aside className={`sidebar${sidebarOpen ? ' open' : ''}`} id="sidebar" aria-hidden={!sidebarOpen}>
           <div className="sidebar-header">
-            <span className="brand">TICKET LEAD</span>
             <button type="button" className="sidebar-close" aria-label="Close menu" onClick={closeSidebar}>
               <i className="fas fa-times"></i>
             </button>
@@ -58,7 +54,10 @@ export default function DashboardLayout({ userDisplayName = 'Alex Robert', userA
                   <NavLink
                     to={item.to}
                     end={item.end}
-                    className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+                    className={({ isActive }) => [
+                      isActive ? 'nav-link active' : 'nav-link',
+                      item.danger ? 'danger' : '',
+                    ].filter(Boolean).join(' ')}
                     onClick={closeSidebar}
                   >
                     <i className={item.icon}></i>
@@ -76,7 +75,10 @@ export default function DashboardLayout({ userDisplayName = 'Alex Robert', userA
                     <NavLink
                       to={item.to}
                       end={item.end}
-                      className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+                      className={({ isActive }) => [
+                        isActive ? 'nav-link active' : 'nav-link',
+                        item.danger ? 'danger' : '',
+                      ].filter(Boolean).join(' ')}
                       onClick={closeSidebar}
                     >
                       <i className={item.icon}></i>
