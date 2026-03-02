@@ -3,8 +3,8 @@ import BodyClass from '../components/BodyClass';
 import TicketAPIProvider from '../components/TicketAPIProvider';
 
 export const metadata = {
-  title: 'TICKET LEAD',
-  description: 'Capital University Ticketing',
+  title: 'BIS TICKET LEAD',
+  description: 'BIS TICKET LEAD',
 };
 
 export default function RootLayout({ children }) {

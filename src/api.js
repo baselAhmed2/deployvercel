@@ -14,6 +14,19 @@ function request(path, options = {}) {
     ...options,
   }).then((res) => {
     if (!res.ok) {
+      if (res.status === 401) {
+        try {
+          localStorage.removeItem('token');
+          localStorage.removeItem('userName');
+          localStorage.removeItem('userId');
+          localStorage.removeItem('userRole');
+          localStorage.removeItem('userProgram');
+          sessionStorage.removeItem('token');
+        } catch (_) { }
+        if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+          window.location.href = '/';
+        }
+      }
       const err = new Error(res.statusText || 'Request failed');
       err.status = res.status;
       return res.json().then((body) => { err.message = body?.message || err.message; throw err; }).catch(() => { throw err; });

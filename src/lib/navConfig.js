@@ -15,6 +15,7 @@ export const adminNav = [
   { href: '/administrator', label: 'Dashboard', icon: 'fas fa-th-large', end: true },
   { href: '/administrator/tickets', label: 'Tickets', icon: 'fas fa-ticket-alt' },
   { href: '/administrator/users', label: 'Users', icon: 'fas fa-users' },
+  { href: '/administrator/student-tickets', label: 'Student Tickets', icon: 'fas fa-search' },
   { href: '/administrator/add-subject', label: 'Add Subject', icon: 'fas fa-book-open' },
   { href: '/administrator/add-course', label: 'Assign Subjects to Doctor', icon: 'fas fa-user-plus' },
   { href: '/administrator/analysis', label: 'Analysis', icon: 'fas fa-chart-bar' },

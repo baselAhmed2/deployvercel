@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { showToast } from '../../../utils/toast';
 
@@ -17,44 +17,70 @@ function getLevelStyle(level) {
 
 export default function AdminAddCourse() {
   const [doctorId, setDoctorId] = useState('');
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [subjectIds, setSubjectIds] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [currentSubjects, setCurrentSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingDoctors, setLoadingDoctors] = useState(false);
   const [loadingCurrent, setLoadingCurrent] = useState(false);
   const [saving, setSaving] = useState(false);
   const [searchDoctor, setSearchDoctor] = useState('');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [errorDoctor, setErrorDoctor] = useState(false);
+  const dropdownRef = useRef(null);
 
+  // Close dropdown on outside click
   useEffect(() => {
-    if (typeof window.TicketAPI === 'undefined') {
-      setLoading(false);
-      return;
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
     }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Load subjects once on mount (needed for the assignment grid)
+  useEffect(() => {
+    if (typeof window.TicketAPI === 'undefined') { setLoading(false); return; }
     const api = window.TicketAPI;
-    Promise.all([
-      // Doctors
-      api.getAdminUsers ? api.getAdminUsers(1, 200, '', 'Doctor').then((r) => (r?.data ?? r?.Data ?? [])) : Promise.resolve([]),
-      // SuperAdmins
-      api.getAdminUsers ? api.getAdminUsers(1, 100, '', 'SuperAdmin').then((r) => (r?.data ?? r?.Data ?? [])) : Promise.resolve([]),
-      // SubAdmins
-      api.getAdminUsers ? api.getAdminUsers(1, 100, '', 'SubAdmin').then((r) => (r?.data ?? r?.Data ?? [])) : Promise.resolve([]),
-      // All subjects
-      api.getAdminSubjects ? api.getAdminSubjects() : Promise.resolve([]),
-    ])
-      .then(([doctors, superAdmins, subAdmins, subs]) => {
-        // Merge all — دكاترة أولاً ثم أدمن (مع label واضح)
-        const allDoctors = [
-          ...doctors.map((u) => ({ ...u, _roleLabel: 'Doctor' })),
-          ...superAdmins.map((u) => ({ ...u, _roleLabel: 'SuperAdmin' })),
-          ...subAdmins.map((u) => ({ ...u, _roleLabel: 'SubAdmin' })),
-        ];
-        setDoctors(Array.isArray(allDoctors) ? allDoctors : []);
-        setSubjects(Array.isArray(subs) ? subs : []);
-      })
+    (api.getAdminSubjects ? api.getAdminSubjects() : Promise.resolve([]))
+      .then((subs) => setSubjects(Array.isArray(subs) ? subs : []))
       .catch(() => { })
       .finally(() => setLoading(false));
   }, []);
+
+  // Debounced doctor search — hits API only when user pauses typing
+  useEffect(() => {
+    const q = searchDoctor.trim();
+    if (!q) {
+      setDoctors([]);
+      return;
+    }
+    const handler = setTimeout(() => {
+      if (typeof window.TicketAPI === 'undefined' || !window.TicketAPI.getAdminUsers) return;
+      setLoadingDoctors(true);
+      const api = window.TicketAPI;
+      Promise.all([
+        api.getAdminUsers(1, 20, q, 'Doctor').then((r) => (r?.data ?? r?.Data ?? [])),
+        api.getAdminUsers(1, 10, q, 'SuperAdmin').then((r) => (r?.data ?? r?.Data ?? [])),
+        api.getAdminUsers(1, 10, q, 'SubAdmin').then((r) => (r?.data ?? r?.Data ?? [])),
+      ])
+        .then(([docs, supers, subs]) => {
+          const merged = [
+            ...docs.map((u) => ({ ...u, _roleLabel: 'Doctor' })),
+            ...supers.map((u) => ({ ...u, _roleLabel: 'SuperAdmin' })),
+            ...subs.map((u) => ({ ...u, _roleLabel: 'SubAdmin' })),
+          ];
+          setDoctors(merged);
+        })
+        .catch(() => setDoctors([]))
+        .finally(() => setLoadingDoctors(false));
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [searchDoctor]);
 
 
   useEffect(() => {
@@ -74,16 +100,40 @@ export default function AdminAddCourse() {
   }, [doctorId]);
 
   const toggleSubject = (id) => {
+    if (!doctorId) {
+      setErrorDoctor(true);
+      showToast('Select a doctor first.', 'error');
+      return;
+    }
     setSubjectIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
 
-  const selectAll = () => setSubjectIds(subjects.map((s) => s.id ?? s.Id));
-  const clearAll = () => setSubjectIds([]);
+  const selectAll = () => {
+    if (!doctorId) {
+      setErrorDoctor(true);
+      showToast('Select a doctor first.', 'error');
+      return;
+    }
+    setSubjectIds(subjects.map((s) => s.id ?? s.Id));
+  };
+  const clearAll = () => {
+    if (!doctorId) {
+      setErrorDoctor(true);
+      showToast('Select a doctor first.', 'error');
+      return;
+    }
+    setSubjectIds([]);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!doctorId || subjectIds.length === 0) {
-      showToast('Select a doctor and at least one subject.', 'error');
+    if (!doctorId) {
+      setErrorDoctor(true);
+      showToast('Select a doctor first.', 'error');
+      return;
+    }
+    if (subjectIds.length === 0) {
+      showToast('Select at least one subject.', 'error');
       return;
     }
     if (!window.TicketAPI?.assignSubjectsToDoctor) {
@@ -100,7 +150,6 @@ export default function AdminAddCourse() {
       .finally(() => setSaving(false));
   };
 
-  const selectedDoctor = doctors.find((d) => (d.id ?? d.Id) === doctorId);
   const selectedDoctorName = selectedDoctor ? (selectedDoctor.name ?? selectedDoctor.Name ?? selectedDoctor.userName ?? selectedDoctor.UserName) : '';
 
   const groupedByLevel = {};
@@ -110,15 +159,6 @@ export default function AdminAddCourse() {
     groupedByLevel[lvl].push(s);
   });
   const sortedLevels = Object.keys(groupedByLevel).sort((a, b) => a - b);
-
-  const filteredDoctors = searchDoctor.trim()
-    ? doctors.filter((d) => {
-      const n = (d.name ?? d.Name ?? d.userName ?? d.UserName ?? '').toLowerCase();
-      const i = (d.id ?? d.Id ?? '').toLowerCase();
-      const q = searchDoctor.toLowerCase();
-      return n.includes(q) || i.includes(q);
-    })
-    : doctors;
 
   if (loading) {
     return (
@@ -142,27 +182,107 @@ export default function AdminAddCourse() {
       <div className="detail-card" style={{ marginBottom: 20 }}>
         <h2 className="section-title"><i className="fas fa-user-md" style={{ color: '#6f42c1', marginRight: 8 }}></i>Step 1: Select Doctor</h2>
         <p className="section-desc">Choose the doctor to assign subjects to</p>
-        <div style={{ maxWidth: 400 }}>
-          <input
-            type="text"
-            className="form-input"
-            placeholder="Search doctor by name or ID..."
-            value={searchDoctor}
-            onChange={(e) => setSearchDoctor(e.target.value)}
-            style={{ marginBottom: 10 }}
-          />
-          <select className="form-select" value={doctorId} onChange={(e) => setDoctorId(e.target.value)} style={{ width: '100%' }}>
-            <option value="">— Choose Doctor —</option>
-            {filteredDoctors.map((d) => {
-              const did = d.id ?? d.Id;
-              const dname = d.name ?? d.Name ?? d.userName ?? d.UserName;
-              const prog = d.program ?? d.Program ?? '';
-              const roleLabel = d._roleLabel ?? (d.role ?? d.Role ?? 'Doctor');
-              const isAdmin = roleLabel === 'SuperAdmin' || roleLabel === 'SubAdmin';
-              const prefix = isAdmin ? `[${roleLabel}] ` : '';
-              return <option key={did} value={did}>{prefix}{dname} ({did}){prog ? ` — ${prog}` : ''}</option>;
-            })}
-          </select>
+        <div style={{ maxWidth: 440, position: 'relative' }} ref={dropdownRef}>
+          <div style={{ position: 'relative' }}>
+            <i className="fas fa-search" style={{
+              position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
+              color: '#aaa', pointerEvents: 'none', fontSize: '0.9rem',
+            }} />
+            <input
+              type="text"
+              className="form-input"
+              placeholder="Search doctor by name or ID..."
+              value={searchDoctor}
+              autoComplete="off"
+              onFocus={() => setDropdownOpen(true)}
+              onChange={(e) => { setSearchDoctor(e.target.value); setDropdownOpen(true); }}
+              style={{
+                paddingLeft: 36,
+                width: '100%',
+                borderColor: errorDoctor ? '#ef4444' : undefined,
+                boxShadow: errorDoctor ? '0 0 0 3px rgba(239, 68, 68, 0.15)' : undefined
+              }}
+            />
+            {searchDoctor && (
+              <button
+                type="button"
+                onClick={() => { setSearchDoctor(''); setDoctorId(''); setSelectedDoctor(null); setDropdownOpen(false); setErrorDoctor(false); }}
+                style={{
+                  position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
+                  border: 'none', background: 'none', cursor: 'pointer', color: '#aaa', fontSize: '1rem',
+                }}
+              >
+                <i className="fas fa-times" />
+              </button>
+            )}
+          </div>
+
+          {dropdownOpen && searchDoctor.trim() && (
+            <div style={{
+              position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0,
+              background: '#fff', border: '1px solid #dee2e6', borderRadius: 8,
+              boxShadow: '0 6px 20px rgba(0,0,0,0.12)', zIndex: 300,
+              maxHeight: 260, overflowY: 'auto',
+            }}>
+              {loadingDoctors ? (
+                <div style={{ padding: '12px 16px', color: '#888', fontSize: '0.9rem' }}>
+                  <i className="fas fa-spinner fa-spin" style={{ marginRight: 8 }} />Searching...
+                </div>
+              ) : doctors.length === 0 ? (
+                <div style={{ padding: '12px 16px', color: '#888', fontSize: '0.9rem' }}>No results found</div>
+              ) : (
+                doctors.map((d) => {
+                  const did = d.id ?? d.Id;
+                  const dname = d.name ?? d.Name ?? d.userName ?? d.UserName ?? '';
+                  const prog = d.program ?? d.Program ?? '';
+                  const roleLabel = d._roleLabel ?? (d.role ?? d.Role ?? 'Doctor');
+                  const isAdmin = roleLabel === 'SuperAdmin' || roleLabel === 'SubAdmin';
+                  const isSelected = doctorId === did;
+                  return (
+                    <div
+                      key={did}
+                      onMouseDown={() => {
+                        setDoctorId(did);
+                        setSelectedDoctor(d);
+                        setSearchDoctor(dname);
+                        setDropdownOpen(false);
+                        setErrorDoctor(false);
+                      }}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        padding: '10px 14px', cursor: 'pointer',
+                        background: isSelected ? 'rgba(111, 66, 193, 0.08)' : '#fff',
+                        borderBottom: '1px solid #f1f1f1',
+                        transition: 'background 0.15s',
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(111, 66, 193, 0.05)'}
+                      onMouseLeave={e => e.currentTarget.style.background = isSelected ? 'rgba(111, 66, 193, 0.08)' : '#fff'}
+                    >
+                      <img
+                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(dname)}&size=32&background=6f42c1&color=fff`}
+                        alt=""
+                        style={{ borderRadius: '50%', width: 32, height: 32, flexShrink: 0 }}
+                      />
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: 6 }}>
+                          {dname}
+                          {isAdmin && (
+                            <span style={{ fontSize: '0.7rem', background: '#6f42c1', color: '#fff', borderRadius: 6, padding: '1px 6px' }}>
+                              {roleLabel}
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ fontSize: '0.78rem', color: '#888' }}>
+                          {did}{prog ? ` — ${prog}` : ''}
+                        </div>
+                      </div>
+                      {isSelected && <i className="fas fa-check" style={{ marginLeft: 'auto', color: '#6f42c1' }} />}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          )}
         </div>
 
         {doctorId && selectedDoctor && (

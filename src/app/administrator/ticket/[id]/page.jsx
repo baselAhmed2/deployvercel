@@ -21,7 +21,8 @@ function formatDate(d) {
 export default function AdminTicketDetail() {
   const router = useRouter();
   const params = useParams();
-  const ticketId = params?.id ?? '';
+  const rawId = params?.id ?? '';
+  const ticketId = (() => { try { return decodeURIComponent(rawId); } catch { return rawId; } })();
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

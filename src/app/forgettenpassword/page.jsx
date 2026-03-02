@@ -42,9 +42,9 @@ export default function ForgotPasswordPage() {
         <div className="login-card">
           <div className="card-header">
             <div className="logo">
-              <img src="/login/imgs/image%20(5).png" alt="Capital University" className="logo-img" onError={(e) => { e.target.style.display = 'none'; }} />
+              <img src="/login/imgs/image%20(5).png" alt="BIS TICKET LEAD" className="logo-img" onError={(e) => { e.target.style.display = 'none'; }} />
             </div>
-            <h1 className="university-name">Capital University</h1>
+            <h1 className="university-name">BIS TICKET LEAD</h1>
             <p className="portal-title">Reset Your Password</p>
           </div>
           <form className="login-form" onSubmit={handleSubmit}>
@@ -70,7 +70,7 @@ export default function ForgotPasswordPage() {
         </div>
       </main>
       <footer className="page-footer">
-        © 2026 Capital University. All rights reserved.
+        © 2026 BIS TICKET LEAD. All rights reserved.
       </footer>
     </>
   );

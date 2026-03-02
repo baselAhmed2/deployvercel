@@ -16,7 +16,8 @@ function formatDate(d) {
 
 export default function StudentTicketDetailPage() {
   const params = useParams();
-  const ticketId = params?.id ?? '';
+  const rawId = params?.id ?? '';
+  const ticketId = (() => { try { return decodeURIComponent(rawId); } catch { return rawId; } })();
   const [senderOpen, setSenderOpen] = useState(true);
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);

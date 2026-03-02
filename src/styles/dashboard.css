@@ -1290,6 +1290,11 @@ body.dashboard-body {
   .welcome-text {
     display: none;
   }
+
+  .app-header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1330,6 +1335,14 @@ body.dashboard-body {
     flex-shrink: 0;
   }
 
+  .stat-card {
+    min-height: auto;
+  }
+
+  .user-list {
+    overflow-x: auto;
+  }
+
   .ticket-card-header {
     flex-direction: column;
     align-items: flex-start;
@@ -1360,11 +1373,17 @@ body.dashboard-body {
   .user-card {
     flex-direction: column;
     align-items: flex-start;
+    padding: 16px;
   }
 
   .danger-card {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .form-section,
+  .detail-card {
+    padding: 16px;
   }
 }
 

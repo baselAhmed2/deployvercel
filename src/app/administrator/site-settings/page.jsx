@@ -67,43 +67,27 @@ export default function AdminSiteSettings() {
 
     const api = window.TicketAPI;
     const deleteAll = async () => {
-      if (api.getAdminAllTickets) {
-        try {
-          const res = await api.getAdminAllTickets(1, 200);
-          const tickets = res?.data ?? res?.Data ?? [];
-          if (!Array.isArray(tickets) || tickets.length === 0) {
-            showToast('No tickets to delete.');
-            setPhase('idle');
-            setDeleting(false);
-            return;
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, '')}/api/Admin/end-term`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
           }
-          let deleted = 0;
-          let failed = 0;
-          for (const t of tickets) {
-            const tid = t.id ?? t.Id;
-            if (!tid) continue;
-            try {
-              await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, '')}/api/Tickets/${encodeURIComponent(tid)}`,
-                {
-                  method: 'DELETE',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                  },
-                }
-              );
-              deleted++;
-            } catch (_) {
-              failed++;
-            }
-          }
-          showToast(`Deleted ${deleted} ticket(s).${failed ? ` ${failed} failed.` : ''}`);
-        } catch (err) {
-          showToast((err && err.message) ? err.message : 'Failed to delete tickets.', 'error');
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to delete tickets. Ensure you have the correct permissions.');
         }
-      } else {
-        showToast('Delete API is not available.', 'error');
+
+        const data = await response.json();
+        const count = data.deletedCount || 0;
+        showToast(`Successfully deleted ${count} ticket(s). All data cleared.`);
+      } catch (err) {
+        showToast((err && err.message) ? err.message : 'Failed to delete tickets.', 'error');
       }
       setPhase('idle');
       setDeleting(false);
@@ -113,7 +97,8 @@ export default function AdminSiteSettings() {
     deleteAll();
   };
 
-  const progressPct = phase === 'countdown' ? ((COUNTDOWN_SECONDS - countdown) / COUNTDOWN_SECONDS) * 100 : phase === 'ready' ? 100 : 0;
+  const userRole = typeof window !== 'undefined' ? localStorage.getItem('userRole') : null;
+  const isSuperAdmin = userRole === 'SuperAdmin';
 
   return (
     <>
@@ -184,101 +169,103 @@ export default function AdminSiteSettings() {
       </div>
 
       {/* Danger Zone */}
-      <div className="detail-card danger-card">
-        <div>
-          <div className="danger-card-title">
-            <i className="fas fa-exclamation-triangle" style={{ color: '#dc3545', marginRight: 8 }}></i>
-            Delete all Tickets Data
+      {isSuperAdmin && (
+        <div className="detail-card danger-card">
+          <div>
+            <div className="danger-card-title">
+              <i className="fas fa-exclamation-triangle" style={{ color: '#dc3545', marginRight: 8 }}></i>
+              Delete all Tickets Data
+            </div>
+            <p className="danger-card-note">
+              Ensure: Delete Includes All Ticket Data <span className="except">Except Users</span>
+            </p>
           </div>
-          <p className="danger-card-note">
-            Ensure: Delete Includes All Ticket Data <span className="except">Except Users</span>
-          </p>
-        </div>
 
-        {phase === 'idle' && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <button type="button" className="btn-danger" onClick={handleFirstClick}>
-              <i className="fas fa-trash-alt"></i> Delete All Tickets
-            </button>
-          </div>
-        )}
+          {phase === 'idle' && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <button type="button" className="btn-danger" onClick={handleFirstClick}>
+                <i className="fas fa-trash-alt"></i> Delete All Tickets
+              </button>
+            </div>
+          )}
 
-        {phase === 'countdown' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 280 }}>
-            <div style={{
-              background: '#fff3cd',
-              border: '1px solid #ffc107',
-              borderRadius: 8,
-              padding: '16px 20px',
-              textAlign: 'center',
-            }}>
-              <p style={{ margin: '0 0 8px', fontWeight: 600, color: '#856404' }}>
-                <i className="fas fa-hourglass-half"></i> Please wait before confirming
-              </p>
+          {phase === 'countdown' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 280 }}>
               <div style={{
-                fontSize: '2.5rem',
-                fontWeight: 700,
-                color: countdown <= 5 ? '#dc3545' : '#856404',
-                fontVariantNumeric: 'tabular-nums',
+                background: '#fff3cd',
+                border: '1px solid #ffc107',
+                borderRadius: 8,
+                padding: '16px 20px',
+                textAlign: 'center',
               }}>
-                {countdown}s
-              </div>
-              <div style={{
-                background: '#e9ecef',
-                borderRadius: 4,
-                height: 6,
-                marginTop: 8,
-                overflow: 'hidden',
-              }}>
+                <p style={{ margin: '0 0 8px', fontWeight: 600, color: '#856404' }}>
+                  <i className="fas fa-hourglass-half"></i> Please wait before confirming
+                </p>
                 <div style={{
-                  height: '100%',
-                  background: countdown <= 5 ? '#dc3545' : '#ffc107',
-                  width: `${progressPct}%`,
-                  transition: 'width 1s linear, background 0.3s',
+                  fontSize: '2.5rem',
+                  fontWeight: 700,
+                  color: countdown <= 5 ? '#dc3545' : '#856404',
+                  fontVariantNumeric: 'tabular-nums',
+                }}>
+                  {countdown}s
+                </div>
+                <div style={{
+                  background: '#e9ecef',
                   borderRadius: 4,
-                }} />
+                  height: 6,
+                  marginTop: 8,
+                  overflow: 'hidden',
+                }}>
+                  <div style={{
+                    height: '100%',
+                    background: countdown <= 5 ? '#dc3545' : '#ffc107',
+                    width: `${progressPct}%`,
+                    transition: 'width 1s linear, background 0.3s',
+                    borderRadius: 4,
+                  }} />
+                </div>
               </div>
-            </div>
-            <button type="button" className="btn-primary" onClick={handleCancel} style={{ alignSelf: 'center' }}>
-              <i className="fas fa-times"></i> Cancel
-            </button>
-          </div>
-        )}
-
-        {phase === 'ready' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 280 }}>
-            <div style={{
-              background: '#f8d7da',
-              border: '1px solid #dc3545',
-              borderRadius: 8,
-              padding: '16px 20px',
-              textAlign: 'center',
-            }}>
-              <p style={{ margin: '0 0 4px', fontWeight: 700, color: '#721c24', fontSize: '1.1rem' }}>
-                <i className="fas fa-exclamation-circle"></i> Are you absolutely sure?
-              </p>
-              <p style={{ margin: 0, color: '#721c24', fontSize: '0.9rem' }}>
-                This will permanently delete ALL tickets. This action cannot be undone.
-              </p>
-            </div>
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-              <button type="button" className="btn-primary" onClick={handleCancel} disabled={deleting}>
+              <button type="button" className="btn-primary" onClick={handleCancel} style={{ alignSelf: 'center' }}>
                 <i className="fas fa-times"></i> Cancel
               </button>
-              <button type="button" className="btn-danger" onClick={handleConfirmDelete} disabled={deleting} style={{
-                animation: 'none',
-                fontWeight: 700,
-              }}>
-                {deleting ? (
-                  <><i className="fas fa-spinner fa-spin"></i> Deleting...</>
-                ) : (
-                  <><i className="fas fa-trash-alt"></i> Yes, Delete Everything</>
-                )}
-              </button>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+
+          {phase === 'ready' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 280 }}>
+              <div style={{
+                background: '#f8d7da',
+                border: '1px solid #dc3545',
+                borderRadius: 8,
+                padding: '16px 20px',
+                textAlign: 'center',
+              }}>
+                <p style={{ margin: '0 0 4px', fontWeight: 700, color: '#721c24', fontSize: '1.1rem' }}>
+                  <i className="fas fa-exclamation-circle"></i> Are you absolutely sure?
+                </p>
+                <p style={{ margin: 0, color: '#721c24', fontSize: '0.9rem' }}>
+                  This will permanently delete ALL tickets. This action cannot be undone.
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+                <button type="button" className="btn-primary" onClick={handleCancel} disabled={deleting}>
+                  <i className="fas fa-times"></i> Cancel
+                </button>
+                <button type="button" className="btn-danger" onClick={handleConfirmDelete} disabled={deleting} style={{
+                  animation: 'none',
+                  fontWeight: 700,
+                }}>
+                  {deleting ? (
+                    <><i className="fas fa-spinner fa-spin"></i> Deleting...</>
+                  ) : (
+                    <><i className="fas fa-trash-alt"></i> Yes, Delete Everything</>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       <BulkUploadModal
         isOpen={isUploadOpen}

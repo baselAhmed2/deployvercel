@@ -513,18 +513,19 @@ export default function AdminDashboard() {
           </div>
         )}
       </CollapsibleSection>
-
-      <div className="detail-card danger-card" style={{ marginTop: 16 }}>
-        <div>
-          <div className="danger-card-title"><i className="fas fa-info-circle"></i> Delete all Tickets Data</div>
-          <p className="danger-card-note">Bulk delete is not supported. Delete tickets individually from the ticket list.</p>
+      {isSuperAdmin && (
+        <div className="detail-card danger-card" style={{ marginTop: 16 }}>
+          <div>
+            <div className="danger-card-title"><i className="fas fa-info-circle"></i> Delete all Tickets Data</div>
+            <p className="danger-card-note">Bulk delete is not supported. Delete tickets individually from the ticket list.</p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <button type="button" className="btn-danger" onClick={handleDeleteTickets}>
+              <i className="fas fa-info-circle"></i> Info
+            </button>
+          </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button type="button" className="btn-danger" onClick={handleDeleteTickets}>
-            <i className="fas fa-info-circle"></i> Info
-          </button>
-        </div>
-      </div>
+      )}
     </>
   );
 }

@@ -22,11 +22,17 @@ function LoginForm() {
   const [studentId, setStudentId] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (typeof window.TicketAPI !== 'undefined' && window.TicketAPI.clearAuth) {
       window.TicketAPI.clearAuth();
+    }
+    const savedId = localStorage.getItem('rememberedStudentId');
+    if (savedId) {
+      setStudentId(savedId);
+      setRememberMe(true);
     }
   }, []);
 
@@ -58,7 +64,13 @@ function LoginForm() {
             if (role != null) localStorage.setItem('userRole', role);
             if (program != null) localStorage.setItem('userProgram', program);
             else localStorage.removeItem('userProgram');
-          } catch (_) {}
+
+            if (rememberMe) {
+              localStorage.setItem('rememberedStudentId', sid);
+            } else {
+              localStorage.removeItem('rememberedStudentId');
+            }
+          } catch (_) { }
           router.push(roleToDashboardPath(role));
         } else {
           setError('Invalid response from server.');
@@ -87,9 +99,9 @@ function LoginForm() {
         <div className="login-card">
           <div className="card-header">
             <div className="logo">
-              <img src="/login/imgs/image%20(5).png" alt="Capital University" className="logo-img" onError={(e) => { e.target.style.display = 'none'; }} />
+              <img src="/login/imgs/image%20(5).png" alt="BIS TICKET LEAD" className="logo-img" onError={(e) => { e.target.style.display = 'none'; }} />
             </div>
-            <h1 className="university-name">Capital University</h1>
+            <h1 className="university-name">BIS TICKET LEAD</h1>
             <p className="portal-title">{portalTitle}</p>
           </div>
           <form className="login-form" onSubmit={handleSubmit}>
@@ -124,7 +136,12 @@ function LoginForm() {
             </div>
             <div className="form-options">
               <label className="remember-me">
-                <input type="checkbox" name="remember" />
+                <input
+                  type="checkbox"
+                  name="remember"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                />
                 <span>Remember me</span>
               </label>
             </div>
@@ -137,7 +154,7 @@ function LoginForm() {
         </div>
       </main>
       <footer className="page-footer">
-        © 2026 Capital University. All rights reserved.
+        © 2026 BIS TICKET LEAD. All rights reserved.
       </footer>
     </>
   );

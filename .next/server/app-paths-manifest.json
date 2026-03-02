@@ -1,10 +1,9 @@
 {
   "/page": "app/page.js",
   "/api/proxy/[...path]/route": "app/api/proxy/[...path]/route.js",
-  "/administrator/site-settings/page": "app/administrator/site-settings/page.js",
   "/administrator/page": "app/administrator/page.js",
-  "/student/page": "app/student/page.js",
   "/administrator/users/page": "app/administrator/users/page.js",
-  "/administrator/add-subject/page": "app/administrator/add-subject/page.js",
-  "/administrator/tickets/page": "app/administrator/tickets/page.js"
+  "/administrator/tickets/page": "app/administrator/tickets/page.js",
+  "/administrator/ticket/[id]/page": "app/administrator/ticket/[id]/page.js",
+  "/administrator/add-subject/page": "app/administrator/add-subject/page.js"
 }
