@@ -1,6 +1,7 @@
 import './globals.css';
 import BodyClass from '../components/BodyClass';
 import TicketAPIProvider from '../components/TicketAPIProvider';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata = {
   title: 'BIS TICKET LEAD',
@@ -32,6 +33,7 @@ export default function RootLayout({ children }) {
         <BodyClass />
         <TicketAPIProvider />
         {children}
+        <SpeedInsights />
       </body>
     </html>
   );
