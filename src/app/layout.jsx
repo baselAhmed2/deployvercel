@@ -5,6 +5,9 @@ import TicketAPIProvider from '../components/TicketAPIProvider';
 export const metadata = {
   title: 'BIS TICKET LEAD',
   description: 'BIS TICKET LEAD',
+  icons: {
+    icon: '/Logos/bis-favicon.jpeg',
+  },
 };
 
 export default function RootLayout({ children }) {
