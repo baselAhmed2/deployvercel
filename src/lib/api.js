@@ -199,9 +199,6 @@ export const TicketAPI = {
   getStudentTickets(studentId, pageIndex = 1, pageSize = 10) {
     return request(`/api/Admin/students/${encodeURIComponent(studentId)}/tickets?pageIndex=${pageIndex}&pageSize=${pageSize}`);
   },
-  getStudentTicketCount(studentId) {
-    return request(`/api/Analytics/student-ticket-count/${encodeURIComponent(studentId)}`);
-  },
   getAdminAllTickets(pageIndex = 1, pageSize = 10) {
     return request(`/api/Tickets/all?pageIndex=${pageIndex}&pageSize=${pageSize}`);
   },

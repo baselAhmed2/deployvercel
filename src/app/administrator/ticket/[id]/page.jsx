@@ -155,26 +155,23 @@ export default function AdminTicketDetail() {
         <button type="button" className="collapsible-header" aria-expanded={senderOpen} onClick={() => setSenderOpen(!senderOpen)}>
           Ticket Sender Information <i className="fas fa-chevron-down"></i>
         </button>
-        <div id="sender-info" className="sender-info-fields" hidden={!senderOpen}>
-          <div className="form-grid">
-            <div className="form-group">
-              <label className="form-label">Student ID</label>
-              <input type="text" className="form-input" value={studentId} readOnly />
+        <div id="sender-info" className="sender-sleek-card" hidden={!senderOpen}>
+          <div className="sleek-grid">
+            <div className="sleek-item">
+              <span className="sleek-label">Student ID</span>
+              <span className="sleek-value">{studentId}</span>
             </div>
-            <div className="form-group">
-              <label className="form-label">Student Name</label>
-              <input type="text" className="form-input" value={studentName} readOnly />
+            <div className="sleek-item">
+              <span className="sleek-label">Student Name</span>
+              <span className="sleek-value">{studentName}</span>
             </div>
-            <div className="form-group">
-              <label className="form-label">Course</label>
-              <div className="form-input form-input--with-dot">
-                <span className="legend-dot orange"></span>
-                <span>{subjectName}</span>
-              </div>
+            <div className="sleek-item">
+              <span className="sleek-label">Course</span>
+              <span className="sleek-value">{subjectName}</span>
             </div>
-            <div className="form-group">
-              <label className="form-label">Group Number</label>
-              <input type="text" className="form-input" value={groupNumber} readOnly />
+            <div className="sleek-item">
+              <span className="sleek-label">Group Number</span>
+              <span className="sleek-value">{groupNumber}</span>
             </div>
           </div>
         </div>

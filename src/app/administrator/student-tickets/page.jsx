@@ -15,7 +15,10 @@ const STATUS_COLORS = {
 };
 
 function statusStyle(status) {
-    const s = (status ?? '').toLowerCase();
+    let s = String(status ?? '').toLowerCase();
+    if (s === '1') s = 'open';
+    if (s === '2') s = 'pending';
+    if (s === '3') s = 'resolved';
     return STATUS_COLORS[s] ?? { bg: '#e2e3e5', text: '#41464b', label: status || '—' };
 }
 
@@ -48,20 +51,14 @@ function StudentTicketsContent() {
         setError('');
         setSearched(true);
 
-        Promise.all([
-            api.getStudentTickets(id.trim(), page, PAGE_SIZE),
-            page === 1 ? api.getStudentTicketCount(id.trim()) : Promise.resolve(null),
-        ])
-            .then(([ticketsRes, countRes]) => {
+        api.getStudentTickets(id.trim(), page, PAGE_SIZE)
+            .then((ticketsRes) => {
                 const data = ticketsRes?.data ?? ticketsRes?.Data ?? (Array.isArray(ticketsRes) ? ticketsRes : []);
-                const tp = ticketsRes?.totalPages ?? ticketsRes?.TotalPages
-                    ?? Math.max(1, Math.ceil((ticketsRes?.totalCount ?? ticketsRes?.TotalCount ?? 0) / PAGE_SIZE));
+                const tc = ticketsRes?.totalCount ?? ticketsRes?.TotalCount ?? 0;
+                const tp = ticketsRes?.totalPages ?? ticketsRes?.TotalPages ?? Math.max(1, Math.ceil(tc / PAGE_SIZE));
                 setTickets(data);
                 setPagination({ totalPages: tp });
-                if (countRes !== null) {
-                    const cnt = countRes?.count ?? countRes?.Count ?? countRes?.totalCount ?? countRes?.TotalCount ?? countRes;
-                    setTotalCount(typeof cnt === 'number' ? cnt : null);
-                }
+                setTotalCount(tc);
             })
             .catch((err) => {
                 setError((err && err.message) ? err.message : 'Failed to load tickets.');
@@ -228,7 +225,7 @@ function StudentTicketsContent() {
                                         </div>
                                     </div>
                                     <Link
-                                        href={`/administrator/tickets/${encodeURIComponent(id)}`}
+                                        href={`/administrator/ticket/${encodeURIComponent(id)}`}
                                         className="btn-primary btn-sm"
                                         style={{ flexShrink: 0 }}
                                     >

@@ -119,15 +119,24 @@ export default function StudentTicketDetailPage() {
           Ticket Sender Information
           <i className="fas fa-chevron-down"></i>
         </button>
-        <div id="sender-info" hidden={!senderOpen}>
-          <div className="info-grid">
-            <div className="info-item"><label>Student ID</label><span className="value">{studentId}</span></div>
-            <div className="info-item"><label>Student Name</label><span className="value">{studentName}</span></div>
-            <div className="info-item">
-              <label>Course</label>
-              <span className="value"><span className="legend-dot orange" style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: 4 }}></span> {subjectName}</span>
+        <div id="sender-info" className="sender-sleek-card" hidden={!senderOpen}>
+          <div className="sleek-grid">
+            <div className="sleek-item">
+              <span className="sleek-label">Student ID</span>
+              <span className="sleek-value">{studentId}</span>
             </div>
-            <div className="info-item"><label>Group Number</label><span className="value">{groupNumber}</span></div>
+            <div className="sleek-item">
+              <span className="sleek-label">Student Name</span>
+              <span className="sleek-value">{studentName}</span>
+            </div>
+            <div className="sleek-item">
+              <span className="sleek-label">Course</span>
+              <span className="sleek-value">{subjectName}</span>
+            </div>
+            <div className="sleek-item">
+              <span className="sleek-label">Group Number</span>
+              <span className="sleek-value">{groupNumber}</span>
+            </div>
           </div>
         </div>
       </div>
