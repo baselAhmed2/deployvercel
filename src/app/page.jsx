@@ -24,6 +24,7 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (typeof window.TicketAPI !== 'undefined' && window.TicketAPI.clearAuth) {
@@ -49,6 +50,7 @@ function LoginForm() {
       setError('Login service is not available.');
       return;
     }
+    setLoading(true);
     window.TicketAPI.login(sid, pwd)
       .then((res) => {
         const token = res?.token ?? res?.Token;
@@ -74,11 +76,13 @@ function LoginForm() {
           router.push(roleToDashboardPath(role));
         } else {
           setError('Invalid response from server.');
+          setLoading(false);
         }
       })
       .catch((err) => {
         const msg = (err && err.message) ? err.message : 'Invalid Student ID or Password.';
         setError(msg);
+        setLoading(false);
       });
   };
 
@@ -146,9 +150,12 @@ function LoginForm() {
               </label>
             </div>
             {error && <p role="alert" style={{ color: '#dc3545', fontSize: '0.9rem', marginTop: 8 }}>{error}</p>}
-            <button type="submit" className="sign-in-btn">
-              Sign In
-              <i className="fas fa-arrow-right"></i>
+            <button type="submit" className="sign-in-btn" disabled={loading}>
+              {loading ? (
+                <><i className="fas fa-spinner fa-spin" /> Signing in...</>
+              ) : (
+                <>Sign In <i className="fas fa-arrow-right" /></>
+              )}
             </button>
           </form>
         </div>

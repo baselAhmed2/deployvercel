@@ -1,4 +1,42 @@
 /* Dashboard layout - Student, Doctor, Administrator (same design as original) */
+
+/* ── Skeleton / Loading Animations ───────────────────────────────────── */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.skeleton-box {
+  background: linear-gradient(90deg, #e8eaed 25%, #f5f6f7 50%, #e8eaed 75%);
+  background-size: 800px 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+body.dashboard-body.dark .skeleton-box {
+  background: linear-gradient(90deg, #1e2235 25%, #2d3148 50%, #1e2235 75%);
+  background-size: 800px 100%;
+}
+
+body.dashboard-body.dark .skeleton-layout {
+  background: #0f1117 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .skeleton-box,
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 *,
 *::before,
 *::after {

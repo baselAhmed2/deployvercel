@@ -46,9 +46,27 @@ export default function DashboardLayoutNext({ userDisplayName = 'Alex Robert', u
 
   if (!authorized) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12, fontFamily: 'sans-serif' }}>
-        <p style={{ color: '#666' }}>Checking authorization...</p>
-        <p style={{ fontSize: '0.9rem', color: '#999' }}>Redirecting to login if not authenticated</p>
+      <div className="skeleton-layout" style={{
+        display: 'grid', gridTemplateRows: '64px 1fr', minHeight: '100vh', background: 'var(--sk-bg, #f8f9fa)'
+      }}>
+        {/* Header skeleton */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 24px', borderBottom: '1px solid #e9ecef', background: '#fff' }}>
+          <div className="skeleton-box" style={{ width: 32, height: 32, borderRadius: 6 }} />
+          <div className="skeleton-box" style={{ width: 120, height: 20, borderRadius: 6 }} />
+        </div>
+        {/* Body skeleton */}
+        <div style={{ display: 'flex' }}>
+          <div style={{ width: 240, borderRight: '1px solid #e9ecef', padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {[1, 2, 3, 4, 5].map(i => <div key={i} className="skeleton-box" style={{ height: 40, borderRadius: 8 }} />)}
+          </div>
+          <div style={{ flex: 1, padding: 32, display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div className="skeleton-box" style={{ height: 28, width: 200, borderRadius: 8 }} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
+              {[1, 2, 3].map(i => <div key={i} className="skeleton-box" style={{ height: 100, borderRadius: 12 }} />)}
+            </div>
+            <div className="skeleton-box" style={{ height: 200, borderRadius: 12 }} />
+          </div>
+        </div>
       </div>
     );
   }
@@ -115,7 +133,25 @@ export default function DashboardLayoutNext({ userDisplayName = 'Alex Robert', u
             src={`https://ui-avatars.com/api/?name=${encodeURIComponent(avatarName)}&background=6f42c1&color=fff`}
             alt=""
             className="user-avatar"
+            style={{ display: 'none' }}
           />
+          <span
+            className="user-avatar"
+            aria-hidden="true"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(135deg, #6f42c1, #5a32a3)',
+              color: '#fff',
+              fontWeight: 700,
+              fontSize: '0.85rem',
+              userSelect: 'none',
+              letterSpacing: '0.02em',
+            }}
+          >
+            {avatarName ? avatarName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) : '?'}
+          </span>
           <span className="user-name">{displayName}</span>
         </div>
       </header>

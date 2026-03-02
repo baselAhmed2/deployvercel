@@ -90,8 +90,18 @@ export default function DoctorTicketDetail() {
   if (loading) {
     return (
       <>
-        <h1 className="page-title">Tickets</h1>
-        <p style={{ textAlign: 'center', padding: 24 }}><i className="fas fa-spinner fa-spin"></i> Loading...</p>
+        <div className="skeleton-box" style={{ height: 28, width: 180, borderRadius: 8, marginBottom: 20 }} />
+        <div className="detail-card" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div className="skeleton-box" style={{ height: 22, width: '60%', borderRadius: 6 }} />
+          <div className="skeleton-box" style={{ height: 16, width: '80%', borderRadius: 6 }} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            {[1, 2, 3, 4].map(i => <div key={i} className="skeleton-box" style={{ height: 14, borderRadius: 6 }} />)}
+          </div>
+        </div>
+        <div className="detail-card" style={{ padding: 24, marginTop: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div className="skeleton-box" style={{ height: 18, width: 160, borderRadius: 6 }} />
+          {[1, 2].map(i => <div key={i} className="skeleton-box" style={{ height: 70, borderRadius: 8 }} />)}
+        </div>
       </>
     );
   }
