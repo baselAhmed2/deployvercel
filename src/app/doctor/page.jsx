@@ -118,6 +118,20 @@ export default function DoctorDashboard() {
           })
         )}
       </div>
+      <div style={{ textAlign: 'center', marginTop: 16, marginBottom: 8 }}>
+        <Link
+          href="/doctor/tickets"
+          className="btn-primary"
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            padding: '10px 28px', borderRadius: 10, fontWeight: 600,
+            fontSize: '0.95rem',
+          }}
+        >
+          <i className="fas fa-list-ul" />
+          View All Tickets
+        </Link>
+      </div>
       {normalTickets.length > 0 && (
         <>
           <h2 className="section-heading" style={{ marginTop: 24 }}>{highPriorityTickets.length > 0 ? 'Other Tickets' : 'Tickets'}</h2>

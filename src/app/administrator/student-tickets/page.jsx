@@ -258,14 +258,6 @@ function StudentTicketsContent() {
                 </nav>
             )}
 
-            {/* Footer */}
-            <footer style={{
-                marginTop: 32, padding: '24px 0',
-                borderTop: '1px solid #dee2e6',
-                textAlign: 'center', color: '#6c757d', fontSize: '0.9rem'
-            }}>
-                © 2026 BIS TICKET LEAD. All rights reserved.
-            </footer>
         </>
     );
 }

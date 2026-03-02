@@ -3,19 +3,29 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { showToast } from '../../../utils/toast';
+import { useDarkMode } from '../../../hooks/useDarkMode';
 
 const LEVEL_COLORS = {
-  1: { bg: '#e8f5e9', border: '#66bb6a', dot: '#43a047' },
-  2: { bg: '#e3f2fd', border: '#42a5f5', dot: '#1e88e5' },
-  3: { bg: '#fff3e0', border: '#ffa726', dot: '#fb8c00' },
-  4: { bg: '#fce4ec', border: '#ef5350', dot: '#e53935' },
+  1: { bg: '#e8f5e9', bgDark: 'rgba(52,211,153,0.12)', border: '#66bb6a', dot: '#43a047' },
+  2: { bg: '#e3f2fd', bgDark: 'rgba(96,165,250,0.12)', border: '#42a5f5', dot: '#1e88e5' },
+  3: { bg: '#fff3e0', bgDark: 'rgba(251,146,60,0.12)', border: '#ffa726', dot: '#fb8c00' },
+  4: { bg: '#fce4ec', bgDark: 'rgba(248,113,113,0.12)', border: '#ef5350', dot: '#e53935' },
 };
 
 function getLevelStyle(level) {
-  return LEVEL_COLORS[level] || { bg: '#f5f5f5', border: '#bdbdbd', dot: '#757575' };
+  return LEVEL_COLORS[level] || { bg: '#f5f5f5', bgDark: 'rgba(148,163,184,0.1)', border: '#bdbdbd', dot: '#757575' };
 }
 
 export default function AdminAddCourse() {
+  const dark = useDarkMode();
+  const cardBg = dark ? '#1a1d27' : '#fff';
+  const cardBorder = dark ? '#2d3148' : '#dee2e6';
+  const dropdownBg = dark ? '#1e2235' : '#fff';
+  const dropdownBorder = dark ? '#374151' : '#dee2e6';
+  const itemHoverBg = dark ? 'rgba(111,66,193,0.12)' : 'rgba(111,66,193,0.05)';
+  const textMuted = dark ? '#64748b' : '#888';
+  const textBody = dark ? '#94a3b8' : '#495057';
+
   const [doctorId, setDoctorId] = useState('');
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [subjectIds, setSubjectIds] = useState([]);
@@ -220,9 +230,9 @@ export default function AdminAddCourse() {
           {dropdownOpen && searchDoctor.trim() && (
             <div style={{
               position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0,
-              background: '#fff', border: '1px solid #dee2e6', borderRadius: 8,
-              boxShadow: '0 6px 20px rgba(0,0,0,0.12)', zIndex: 300,
-              maxHeight: 260, overflowY: 'auto',
+              background: dropdownBg, border: `1px solid ${dropdownBorder}`, borderRadius: 8,
+              boxShadow: dark ? '0 6px 20px rgba(0,0,0,0.4)' : '0 6px 20px rgba(0,0,0,0.12)',
+              zIndex: 300, maxHeight: 260, overflowY: 'auto',
             }}>
               {loadingDoctors ? (
                 <div style={{ padding: '12px 16px', color: '#888', fontSize: '0.9rem' }}>
@@ -251,12 +261,12 @@ export default function AdminAddCourse() {
                       style={{
                         display: 'flex', alignItems: 'center', gap: 10,
                         padding: '10px 14px', cursor: 'pointer',
-                        background: isSelected ? 'rgba(111, 66, 193, 0.08)' : '#fff',
-                        borderBottom: '1px solid #f1f1f1',
+                        background: isSelected ? 'rgba(111, 66, 193, 0.12)' : dropdownBg,
+                        borderBottom: `1px solid ${dark ? '#2d3148' : '#f1f1f1'}`,
                         transition: 'background 0.15s',
                       }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(111, 66, 193, 0.05)'}
-                      onMouseLeave={e => e.currentTarget.style.background = isSelected ? 'rgba(111, 66, 193, 0.08)' : '#fff'}
+                      onMouseEnter={e => e.currentTarget.style.background = itemHoverBg}
+                      onMouseLeave={e => e.currentTarget.style.background = isSelected ? 'rgba(111, 66, 193, 0.12)' : dropdownBg}
                     >
                       <img
                         src={`https://ui-avatars.com/api/?name=${encodeURIComponent(dname)}&size=32&background=6f42c1&color=fff`}
@@ -264,7 +274,7 @@ export default function AdminAddCourse() {
                         style={{ borderRadius: '50%', width: 32, height: 32, flexShrink: 0 }}
                       />
                       <div style={{ minWidth: 0 }}>
-                        <div style={{ fontWeight: 600, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <div style={{ fontWeight: 600, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: 6, color: dark ? '#e2e8f0' : '#212529' }}>
                           {dname}
                           {isAdmin && (
                             <span style={{ fontSize: '0.7rem', background: '#6f42c1', color: '#fff', borderRadius: 6, padding: '1px 6px' }}>
@@ -272,7 +282,7 @@ export default function AdminAddCourse() {
                             </span>
                           )}
                         </div>
-                        <div style={{ fontSize: '0.78rem', color: '#888' }}>
+                        <div style={{ fontSize: '0.78rem', color: textMuted }}>
                           {did}{prog ? ` — ${prog}` : ''}
                         </div>
                       </div>
@@ -287,14 +297,11 @@ export default function AdminAddCourse() {
 
         {doctorId && selectedDoctor && (
           <div style={{
-            marginTop: 16,
-            padding: '12px 16px',
-            background: '#f3e8ff',
+            marginTop: 16, padding: '12px 16px',
+            background: dark ? 'rgba(111,66,193,0.15)' : '#f3e8ff',
             borderRadius: 8,
-            border: '1px solid #d8b4fe',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
+            border: `1px solid ${dark ? '#6f42c1' : '#d8b4fe'}`,
+            display: 'flex', alignItems: 'center', gap: 12,
           }}>
             <img
               src={`https://ui-avatars.com/api/?name=${encodeURIComponent(selectedDoctorName)}&size=40&background=6f42c1&color=fff`}
@@ -303,7 +310,7 @@ export default function AdminAddCourse() {
             />
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                <strong style={{ fontSize: '1rem' }}>{selectedDoctorName}</strong>
+                <strong style={{ fontSize: '1rem', color: dark ? '#e2e8f0' : '#212529' }}>{selectedDoctorName}</strong>
                 {(() => {
                   const rl = selectedDoctor._roleLabel ?? (selectedDoctor.role ?? selectedDoctor.Role ?? '');
                   const isAdmin = rl === 'SuperAdmin' || rl === 'SubAdmin';
@@ -314,13 +321,13 @@ export default function AdminAddCourse() {
                   ) : null;
                 })()}
               </div>
-              <div style={{ fontSize: '0.85rem', color: '#6b21a8' }}>
+              <div style={{ fontSize: '0.85rem', color: dark ? '#a78bfa' : '#6b21a8' }}>
                 ID: {doctorId} {(selectedDoctor.program ?? selectedDoctor.Program) ? `— ${selectedDoctor.program ?? selectedDoctor.Program}` : ''}
               </div>
             </div>
             {loadingCurrent && <i className="fas fa-spinner fa-spin" style={{ marginLeft: 'auto', color: '#6f42c1' }}></i>}
             {!loadingCurrent && currentSubjects.length > 0 && (
-              <span style={{ marginLeft: 'auto', fontSize: '0.8rem', color: '#6b21a8', fontWeight: 500 }}>
+              <span style={{ marginLeft: 'auto', fontSize: '0.8rem', color: dark ? '#a78bfa' : '#6b21a8', fontWeight: 500 }}>
                 Currently: {currentSubjects.length} subject(s)
               </span>
             )}
@@ -339,13 +346,13 @@ export default function AdminAddCourse() {
             <div style={{ display: 'flex', gap: 8 }}>
               <button type="button" onClick={selectAll} style={{
                 fontSize: '0.8rem', padding: '4px 10px', borderRadius: 6, border: '1px solid #20c997',
-                background: '#fff', color: '#20c997', cursor: 'pointer', fontWeight: 500,
+                background: dark ? 'rgba(32,201,151,0.12)' : '#fff', color: '#20c997', cursor: 'pointer', fontWeight: 500,
               }}>
                 Select All
               </button>
               <button type="button" onClick={clearAll} style={{
                 fontSize: '0.8rem', padding: '4px 10px', borderRadius: 6, border: '1px solid #dc3545',
-                background: '#fff', color: '#dc3545', cursor: 'pointer', fontWeight: 500,
+                background: dark ? 'rgba(220,53,69,0.12)' : '#fff', color: '#dc3545', cursor: 'pointer', fontWeight: 500,
               }}>
                 Clear All
               </button>
@@ -371,7 +378,7 @@ export default function AdminAddCourse() {
                       width: 8, height: 8, borderRadius: '50%', background: ls.dot, display: 'inline-block',
                     }}></span>
                     Level {lvl}
-                    <span style={{ fontWeight: 400, color: '#888', fontSize: '0.8rem' }}>
+                    <span style={{ fontWeight: 400, color: textMuted, fontSize: '0.8rem' }}>
                       ({levelSubjects.length} subject{levelSubjects.length > 1 ? 's' : ''})
                     </span>
                   </div>
@@ -390,12 +397,10 @@ export default function AdminAddCourse() {
                             display: 'flex',
                             alignItems: 'center',
                             gap: 10,
-                            padding: '10px 14px',
-                            borderRadius: 8,
-                            border: `2px solid ${checked ? ls.dot : '#e9ecef'}`,
-                            background: checked ? ls.bg : '#fff',
-                            cursor: 'pointer',
-                            transition: 'all 0.15s',
+                            padding: '10px 14px', borderRadius: 8,
+                            border: `2px solid ${checked ? ls.dot : (dark ? '#374151' : '#e9ecef')}`,
+                            background: checked ? (dark ? ls.bgDark : ls.bg) : (dark ? '#111827' : '#fff'),
+                            cursor: 'pointer', transition: 'all 0.15s',
                             userSelect: 'none',
                           }}
                         >
@@ -407,10 +412,10 @@ export default function AdminAddCourse() {
                             style={{ accentColor: ls.dot, width: 16, height: 16, flexShrink: 0, cursor: 'pointer' }}
                           />
                           <div style={{ minWidth: 0 }}>
-                            <div style={{ fontWeight: 500, fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            <div style={{ fontWeight: 500, fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: dark ? '#e2e8f0' : '#212529' }}>
                               {sName}
                             </div>
-                            <div style={{ fontSize: '0.75rem', color: '#888' }}>
+                            <div style={{ fontSize: '0.75rem', color: textMuted }}>
                               {sid} — T{sTerm} {sProgram && `— ${sProgram}`}
                             </div>
                           </div>
@@ -426,7 +431,7 @@ export default function AdminAddCourse() {
 
         {/* Submit */}
         <div className="detail-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-          <div style={{ fontSize: '0.9rem', color: '#495057' }}>
+          <div style={{ fontSize: '0.9rem', color: textBody }}>
             {doctorId && subjectIds.length > 0 ? (
               <>
                 <i className="fas fa-check-circle" style={{ color: '#20c997', marginRight: 6 }}></i>

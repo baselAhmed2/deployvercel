@@ -30,11 +30,34 @@ function getStored(key) {
   try { return localStorage.getItem(key); } catch (_) { return null; }
 }
 
+/* ─── Dark Mode Hook ─────────────────────────────────────────────── */
+function useDarkMode() {
+  const [dark, setDark] = useState(false);
+  useEffect(() => {
+    // Initial value
+    setDark(document.body.classList.contains('dark'));
+    // Watch for class changes
+    const observer = new MutationObserver(() => {
+      setDark(document.body.classList.contains('dark'));
+    });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+  return dark;
+}
+
 /* ─── Collapsible Section Component ─────────────────────────────── */
-function CollapsibleSection({ title, icon, iconColor, defaultOpen = false, onOpen, badge, children }) {
+function CollapsibleSection({ title, icon, iconColor, defaultOpen = false, onOpen, badge, children, dark }) {
   const [open, setOpen] = useState(defaultOpen);
   const [loaded, setLoaded] = useState(defaultOpen);
   const calledRef = useRef(false);
+
+  const bg = dark ? '#1e2235' : '#fff';
+  const bgOpen = dark ? '#1e2235' : '#faf8ff';
+  const borderColor = dark ? '#2d3148' : '#e9ecef';
+  const titleColor = dark ? '#e2e8f0' : '#212529';
+  const chevronColor = dark ? '#64748b' : '#6c757d';
+  const shadowOpen = dark ? '0 2px 6px rgba(0,0,0,0.3)' : '0 2px 6px rgba(0,0,0,0.07)';
 
   // لو القسم مفتوح افتراضياً، استدعي onOpen مرة واحدة عند الـ mount
   useEffect(() => {
@@ -67,8 +90,8 @@ function CollapsibleSection({ title, icon, iconColor, defaultOpen = false, onOpe
           alignItems: 'center',
           gap: 10,
           padding: '14px 20px',
-          background: open ? '#faf8ff' : '#fff',
-          border: '1px solid #e9ecef',
+          background: open ? bgOpen : bg,
+          border: `1px solid ${borderColor}`,
           borderRadius: open ? '12px 12px 0 0' : 12,
           cursor: 'pointer',
           textAlign: 'left',
@@ -77,7 +100,7 @@ function CollapsibleSection({ title, icon, iconColor, defaultOpen = false, onOpe
         }}
       >
         {icon && <i className={icon} style={{ color: iconColor || '#6f42c1', fontSize: '1rem', width: 20, textAlign: 'center' }} />}
-        <span style={{ flex: 1, fontWeight: 600, fontSize: '1.05rem', color: '#212529' }}>{title}</span>
+        <span style={{ flex: 1, fontWeight: 600, fontSize: '1.05rem', color: titleColor }}>{title}</span>
         {badge !== undefined && badge !== null && (
           <span style={{
             fontSize: '0.75rem', fontWeight: 700, minWidth: 22, height: 22,
@@ -88,25 +111,24 @@ function CollapsibleSection({ title, icon, iconColor, defaultOpen = false, onOpe
         <i
           className="fas fa-chevron-down"
           style={{
-            fontSize: '0.85rem', color: '#6c757d', marginLeft: 4,
+            fontSize: '0.85rem', color: chevronColor, marginLeft: 4,
             transition: 'transform 0.32s cubic-bezier(0.4, 0, 0.2, 1)',
             transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
           }}
         />
       </button>
 
-      {/* Body — CSS Grid trick: grid-template-rows: 0fr → 1fr gives perfect smooth collapse */}
+      {/* Body — CSS Grid trick */}
       <div style={{
         display: 'grid',
         gridTemplateRows: open ? '1fr' : '0fr',
-        background: '#fff',
-        border: '1px solid #e9ecef',
+        background: bg,
+        border: `1px solid ${borderColor}`,
         borderTop: 'none',
         borderRadius: '0 0 12px 12px',
-        boxShadow: open ? '0 2px 6px rgba(0,0,0,0.07)' : 'none',
+        boxShadow: open ? shadowOpen : 'none',
         transition: 'grid-template-rows 0.32s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease',
       }}>
-        {/* overflow:hidden على الchild الداخلي هو سر الـ trick */}
         <div style={{ overflow: 'hidden' }}>
           <div style={{
             padding: '16px 20px 20px',
@@ -234,15 +256,16 @@ export default function AdminDashboard() {
   }
 
   const getStatusClass = (s) => STATUS_MAP[s] ?? 'blue';
+  const dark = useDarkMode();
+  const cardBg = dark ? '#1a1d27' : '#fff';
+  const cardBorder = dark ? '#2d3148' : '#dee2e6';
+  const textMuted = dark ? '#64748b' : '#888';
+  const textBody = dark ? '#94a3b8' : '#333';
+  const paginationBg = dark ? '#1a1d27' : '#fff';
+  const paginationBorder = dark ? '#2d3148' : '#dee2e6';
+  const paginationText = dark ? '#94a3b8' : '#495057';
 
-  const handleDeleteTickets = () => {
-    showConfirm({
-      title: 'Delete all tickets?',
-      message: 'Bulk delete is not supported by the API. You can delete tickets individually from the ticket detail page.',
-      confirmText: 'OK',
-      cancelText: 'Cancel',
-    }).then(() => { });
-  };
+
 
   if (loading) {
     return (
@@ -302,6 +325,7 @@ export default function AdminDashboard() {
         iconColor="#6f42c1"
         defaultOpen={true}
         onOpen={loadMyTickets}
+        dark={dark}
       >
         {loadingMyTickets ? (
           <p style={{ color: '#888', padding: '4px 0' }}><i className="fas fa-spinner fa-spin" style={{ marginRight: 8 }} />Loading...</p>
@@ -358,15 +382,15 @@ export default function AdminDashboard() {
               onClick={() => loadMyTickets(myTicketsPage - 1)}
               disabled={myTicketsPage <= 1}
               style={{
-                padding: '7px 14px', borderRadius: 7, border: '1px solid #dee2e6',
-                background: '#fff', color: myTicketsPage <= 1 ? '#adb5bd' : '#6f42c1',
+                padding: '7px 14px', borderRadius: 7, border: `1px solid ${paginationBorder}`,
+                background: paginationBg, color: myTicketsPage <= 1 ? '#adb5bd' : '#6f42c1',
                 cursor: myTicketsPage <= 1 ? 'not-allowed' : 'pointer', fontWeight: 500, fontSize: '0.9rem',
               }}
             >
               <i className="fas fa-chevron-left" style={{ marginRight: 4 }} /> Prev
             </button>
 
-            <span style={{ fontSize: '0.9rem', color: '#495057', fontWeight: 500, padding: '0 8px' }}>
+            <span style={{ fontSize: '0.9rem', color: paginationText, fontWeight: 500, padding: '0 8px' }}>
               Page {myTicketsPage} / {myTicketsTotalPages}
             </span>
 
@@ -375,8 +399,8 @@ export default function AdminDashboard() {
               onClick={() => loadMyTickets(myTicketsPage + 1)}
               disabled={myTicketsPage >= myTicketsTotalPages}
               style={{
-                padding: '7px 14px', borderRadius: 7, border: '1px solid #dee2e6',
-                background: '#fff', color: myTicketsPage >= myTicketsTotalPages ? '#adb5bd' : '#6f42c1',
+                padding: '7px 14px', borderRadius: 7, border: `1px solid ${paginationBorder}`,
+                background: paginationBg, color: myTicketsPage >= myTicketsTotalPages ? '#adb5bd' : '#6f42c1',
                 cursor: myTicketsPage >= myTicketsTotalPages ? 'not-allowed' : 'pointer', fontWeight: 500, fontSize: '0.9rem',
               }}
             >
@@ -392,6 +416,7 @@ export default function AdminDashboard() {
         icon="fas fa-comments"
         iconColor="#20c997"
         onOpen={loadMessages}
+        dark={dark}
       >
         {loadingMessages ? (
           <p style={{ padding: 4 }}><i className="fas fa-spinner fa-spin"></i> Loading messages...</p>
@@ -413,18 +438,18 @@ export default function AdminDashboard() {
               return (
                 <div key={msgId} style={{
                   padding: '12px 20px',
-                  borderBottom: '1px solid #f0f0f0',
-                  background: isOwnMessage ? '#f8f9fa' : '#fff',
+                  borderBottom: `1px solid ${dark ? '#2d3148' : '#f0f0f0'}`,
+                  background: isOwnMessage ? (dark ? '#252a3d' : '#f8f9fa') : (dark ? '#1a1d27' : '#fff'),
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(senderName)}&size=24&background=${isOwnMessage ? '6f42c1' : '20c997'}&color=fff`} alt="" style={{ borderRadius: '50%', width: 24, height: 24 }} />
-                      <strong style={{ fontSize: '0.9rem' }}>{senderName}</strong>
+                      <strong style={{ fontSize: '0.9rem', color: dark ? '#e2e8f0' : '#212529' }}>{senderName}</strong>
                       {isOwnMessage && <span style={{ fontSize: '0.75rem', background: '#6f42c1', color: '#fff', padding: '1px 6px', borderRadius: 4 }}>You</span>}
                     </div>
-                    <span style={{ fontSize: '0.8rem', color: '#888' }}>{timeAgo(sentAt)}</span>
+                    <span style={{ fontSize: '0.8rem', color: textMuted }}>{timeAgo(sentAt)}</span>
                   </div>
-                  <p style={{ margin: '4px 0', fontSize: '0.9rem', color: '#333' }}>{body.length > 120 ? body.slice(0, 120) + '...' : body}</p>
+                  <p style={{ margin: '4px 0', fontSize: '0.9rem', color: textBody }}>{body.length > 120 ? body.slice(0, 120) + '...' : body}</p>
                   <Link href={`/administrator/ticket/${ticketId}`} style={{ fontSize: '0.8rem', color: '#0d6efd' }}>
                     <i className="fas fa-ticket-alt"></i> {ticketTitle || ticketId} — {studentName}
                   </Link>
@@ -441,6 +466,7 @@ export default function AdminDashboard() {
         icon="fas fa-ticket-alt"
         iconColor="#fd7e14"
         onOpen={loadRecentTickets}
+        dark={dark}
       >
         {loadingTickets ? (
           <p style={{ color: '#888', padding: '4px 0' }}><i className="fas fa-spinner fa-spin" style={{ marginRight: 8 }} />Loading...</p>
@@ -513,19 +539,7 @@ export default function AdminDashboard() {
           </div>
         )}
       </CollapsibleSection>
-      {isSuperAdmin && (
-        <div className="detail-card danger-card" style={{ marginTop: 16 }}>
-          <div>
-            <div className="danger-card-title"><i className="fas fa-info-circle"></i> Delete all Tickets Data</div>
-            <p className="danger-card-note">Bulk delete is not supported. Delete tickets individually from the ticket list.</p>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <button type="button" className="btn-danger" onClick={handleDeleteTickets}>
-              <i className="fas fa-info-circle"></i> Info
-            </button>
-          </div>
-        </div>
-      )}
+
     </>
   );
 }

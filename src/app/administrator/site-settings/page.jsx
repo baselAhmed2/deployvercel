@@ -3,10 +3,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { showToast } from '../../../utils/toast';
 import BulkUploadModal from '../../../components/BulkUploadModal';
+import { useDarkMode } from '../../../hooks/useDarkMode';
 
 const COUNTDOWN_SECONDS = 15;
 
 export default function AdminSiteSettings() {
+  const dark = useDarkMode();
   const [phase, setPhase] = useState('idle');
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
   const [deleting, setDeleting] = useState(false);
@@ -107,11 +109,11 @@ export default function AdminSiteSettings() {
       {/* Dashboard General Settings */}
       <div className="detail-card" style={{ marginBottom: 24 }}>
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: '1.1rem', fontWeight: 600, color: '#343a40', marginBottom: 4 }}>
+          <div style={{ fontSize: '1.1rem', fontWeight: 600, color: dark ? '#e2e8f0' : '#343a40', marginBottom: 4 }}>
             <i className="fas fa-tachometer-alt" style={{ color: '#6f42c1', marginRight: 8 }}></i>
             Dashboard Performance Filter
           </div>
-          <p style={{ margin: 0, color: '#6c757d', fontSize: '0.9rem' }}>
+          <p style={{ margin: 0, color: dark ? '#94a3b8' : '#6c757d', fontSize: '0.9rem' }}>
             Control the time frame for data fetched on the dashboard. Selecting a shorter period greatly improves performance by excluding old tickets from the statistics.
           </p>
         </div>
@@ -138,23 +140,23 @@ export default function AdminSiteSettings() {
       {deleting && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(255,255,255,0.85)', zIndex: 9999,
+          background: dark ? 'rgba(0,0,0,0.85)' : 'rgba(255,255,255,0.85)', zIndex: 9999,
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
         }}>
           <i className="fas fa-spinner fa-spin" style={{ fontSize: '3rem', color: '#dc3545', marginBottom: 16 }}></i>
           <h2 style={{ color: '#dc3545', margin: 0 }}>Deleting everything...</h2>
-          <p style={{ color: '#666', marginTop: 8 }}>Please do not close this window.</p>
+          <p style={{ color: dark ? '#94a3b8' : '#666', marginTop: 8 }}>Please do not close this window.</p>
         </div>
       )}
 
       {/* Bulk Upload Settings */}
       <div className="detail-card" style={{ marginBottom: 24 }}>
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: '1.1rem', fontWeight: 600, color: '#343a40', marginBottom: 4 }}>
+          <div style={{ fontSize: '1.1rem', fontWeight: 600, color: dark ? '#e2e8f0' : '#343a40', marginBottom: 4 }}>
             <i className="fas fa-file-excel" style={{ color: '#28a745', marginRight: 8 }}></i>
             Students Bulk Management
           </div>
-          <p style={{ margin: 0, color: '#6c757d', fontSize: '0.9rem' }}>
+          <p style={{ margin: 0, color: dark ? '#94a3b8' : '#6c757d', fontSize: '0.9rem' }}>
             Upload an Excel file to quickly insert new students or update existing ones in the system.
           </p>
         </div>
@@ -192,19 +194,19 @@ export default function AdminSiteSettings() {
           {phase === 'countdown' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 280 }}>
               <div style={{
-                background: '#fff3cd',
-                border: '1px solid #ffc107',
+                background: dark ? '#2d261c' : '#fff3cd',
+                border: `1px solid ${dark ? '#856404' : '#ffc107'}`,
                 borderRadius: 8,
                 padding: '16px 20px',
                 textAlign: 'center',
               }}>
-                <p style={{ margin: '0 0 8px', fontWeight: 600, color: '#856404' }}>
+                <p style={{ margin: '0 0 8px', fontWeight: 600, color: dark ? '#fbbf24' : '#856404' }}>
                   <i className="fas fa-hourglass-half"></i> Please wait before confirming
                 </p>
                 <div style={{
                   fontSize: '2.5rem',
                   fontWeight: 700,
-                  color: countdown <= 5 ? '#dc3545' : '#856404',
+                  color: countdown <= 5 ? '#ef4444' : (dark ? '#fbbf24' : '#856404'),
                   fontVariantNumeric: 'tabular-nums',
                 }}>
                   {countdown}s
@@ -234,16 +236,16 @@ export default function AdminSiteSettings() {
           {phase === 'ready' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 280 }}>
               <div style={{
-                background: '#f8d7da',
-                border: '1px solid #dc3545',
+                background: dark ? '#311b1d' : '#f8d7da',
+                border: `1px solid ${dark ? '#991b1b' : '#dc3545'}`,
                 borderRadius: 8,
                 padding: '16px 20px',
                 textAlign: 'center',
               }}>
-                <p style={{ margin: '0 0 4px', fontWeight: 700, color: '#721c24', fontSize: '1.1rem' }}>
+                <p style={{ margin: '0 0 4px', fontWeight: 700, color: dark ? '#f87171' : '#721c24', fontSize: '1.1rem' }}>
                   <i className="fas fa-exclamation-circle"></i> Are you absolutely sure?
                 </p>
-                <p style={{ margin: 0, color: '#721c24', fontSize: '0.9rem' }}>
+                <p style={{ margin: 0, color: dark ? '#fca5a5' : '#721c24', fontSize: '0.9rem' }}>
                   This will permanently delete ALL tickets. This action cannot be undone.
                 </p>
               </div>

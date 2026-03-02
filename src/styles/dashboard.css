@@ -65,6 +65,43 @@ body.dashboard-body {
   letter-spacing: 0.02em;
 }
 
+.header-logo-tray {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(4px);
+  border-radius: 40px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.8), 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.tray-logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  background: #fff;
+  object-fit: cover;
+  margin-left: -16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  position: relative;
+}
+
+.tray-logo:first-child {
+  margin-left: 0;
+}
+
+.tray-logo:hover {
+  transform: scale(1.15) translateY(-4px);
+  z-index: 50;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  border-color: #6f42c1;
+}
+
 .welcome-text {
   color: #495057;
   font-size: 0.95rem;
@@ -273,19 +310,19 @@ body.dashboard-body {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: 8px 12px 12px;
+  padding: 12px;
+  min-height: 60px;
   border-bottom: 1px solid #eee;
-  margin-bottom: 12px;
 }
 
 .sidebar-close {
-  display: none;
   background: none;
   border: none;
   font-size: 1.2rem;
   color: #666;
   cursor: pointer;
   padding: 4px;
+  display: none;
 }
 
 .sidebar nav {
@@ -1472,4 +1509,645 @@ body.dashboard-body {
   border-radius: 8px;
   font-size: 0.95rem;
   cursor: pointer;
+}
+
+/* ─── Users Page Component Styles (base) ─────────── */
+/* (defined above, dark overrides are in the dark mode section) */
+
+/* =====================================================
+   DARK MODE — COMPREHENSIVE
+   ===================================================== */
+
+
+body.dashboard-body.dark .sidebar-header {
+  border-bottom-color: #2d3148;
+}
+
+body.dashboard-body.dark .sidebar-logo-img {
+  border-color: #2d3148;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background: #fff;
+  /* Keep logos on white background for transparency common in logos */
+}
+
+/* Global smooth transition */
+body.dashboard-body,
+body.dashboard-body *:not(.theme-toggle-icon):not(i) {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ── Base ─────────────────────────────────────────── */
+body.dashboard-body.dark {
+  background: #0f1117;
+  color: #e2e8f0;
+}
+
+/* ── Header ───────────────────────────────────────── */
+body.dashboard-body.dark .app-header {
+  background: #1a1d27;
+  border-bottom-color: #2d3148;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
+body.dashboard-body.dark .brand {
+  color: #a78bfa;
+}
+
+body.dashboard-body.dark .welcome-text {
+  color: #94a3b8;
+}
+
+body.dashboard-body.dark .user-name {
+  color: #cbd5e1;
+}
+
+body.dashboard-body.dark .sidebar-toggle,
+body.dashboard-body.dark .sidebar-close {
+  color: #cbd5e1;
+}
+
+body.dashboard-body.dark .sidebar-toggle:hover {
+  background: #2d3148;
+}
+
+/* ── Sidebar ──────────────────────────────────────── */
+body.dashboard-body.dark .sidebar {
+  background: #1a1d27;
+  border-right-color: #2d3148;
+}
+
+body.dashboard-body.dark .sidebar-header {
+  border-bottom-color: #2d3148;
+}
+
+body.dashboard-body.dark .sidebar-footer {
+  border-top-color: #2d3148;
+}
+
+body.dashboard-body.dark .nav-link {
+  color: #94a3b8;
+}
+
+body.dashboard-body.dark .nav-link:hover {
+  background: #2d3148;
+  color: #e2e8f0;
+}
+
+body.dashboard-body.dark .nav-link.active {
+  background: linear-gradient(135deg, #6f42c1, #5a32a3);
+  color: #fff;
+}
+
+body.dashboard-body.dark .nav-link.danger {
+  color: #f87171;
+}
+
+body.dashboard-body.dark .nav-link.danger:hover {
+  background: rgba(220, 53, 69, 0.15);
+  color: #f87171;
+}
+
+body.dashboard-body.dark .nav-link.danger i {
+  color: #f87171;
+}
+
+/* ── Main layout ──────────────────────────────────── */
+body.dashboard-body.dark .app-layout,
+body.dashboard-body.dark .main-content {
+  background: #0f1117;
+}
+
+/* ── Typography ───────────────────────────────────── */
+body.dashboard-body.dark .page-title {
+  color: #e2e8f0;
+}
+
+body.dashboard-body.dark .section-heading {
+  color: #c4b5fd;
+}
+
+body.dashboard-body.dark .section-title {
+  color: #c4b5fd;
+}
+
+body.dashboard-body.dark .section-desc {
+  color: #64748b;
+}
+
+/* ── Stat Cards (keep the gradient colors, but add glow) ─ */
+body.dashboard-body.dark .stat-card {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Ticket Cards ─────────────────────────────────── */
+body.dashboard-body.dark .ticket-card {
+  background: #1a1d27;
+  border-color: #2d3148;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.dashboard-body.dark .ticket-id {
+  color: #e2e8f0;
+}
+
+body.dashboard-body.dark .ticket-subject {
+  color: #e2e8f0;
+}
+
+body.dashboard-body.dark .ticket-preview {
+  color: #94a3b8;
+}
+
+body.dashboard-body.dark .ticket-time {
+  color: #64748b;
+}
+
+body.dashboard-body.dark .ticket-responder {
+  color: #94a3b8;
+}
+
+body.dashboard-body.dark .ticket-card-header {
+  border-bottom-color: #2d3148;
+}
+
+/* ── Status Labels ────────────────────────────────── */
+body.dashboard-body.dark .ticket-status-label.blue {
+  background: rgba(96, 165, 250, 0.15);
+  color: #60a5fa;
+}
+
+body.dashboard-body.dark .ticket-status-label.orange {
+  background: rgba(251, 146, 60, 0.15);
+  color: #fb923c;
+}
+
+body.dashboard-body.dark .ticket-status-label.green {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+}
+
+body.dashboard-body.dark .ticket-status-label.red {
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+}
+
+/* ── Detail Card / Form Section ───────────────────── */
+body.dashboard-body.dark .detail-card,
+body.dashboard-body.dark .form-section,
+body.dashboard-body.dark .danger-card {
+  background: #1a1d27;
+  border-color: #2d3148;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.dashboard-body.dark .detail-header {
+  border-bottom-color: #2d3148;
+}
+
+body.dashboard-body.dark .detail-body {
+  color: #94a3b8;
+}
+
+body.dashboard-body.dark .detail-category {
+  color: #64748b;
+}
+
+body.dashboard-body.dark .danger-card-title {
+  color: #e2e8f0;
+}
+
+body.dashboard-body.dark .danger-card-note {
+  color: #64748b;
+}
+
+body.dashboard-body.dark .danger-card-meta {
+  color: #64748b;
+}
+
+/* ── Collapsible Section (inline-style overrides via selector specificity) ── */
+body.dashboard-body.dark button[style*="background: #faf8ff"],
+body.dashboard-body.dark button[style*="background: #fff"] {
+  background: #1e2235 !important;
+  border-color: #2d3148 !important;
+  color: #e2e8f0 !important;
+}
+
+body.dashboard-body.dark button[style*="background: #faf8ff"]:hover,
+body.dashboard-body.dark button[style*="background: #fff"]:hover {
+  background: #2d3148 !important;
+}
+
+body.dashboard-body.dark div[style*="background: #fff"][style*="border: 1px solid #e9ecef"] {
+  background: #1a1d27 !important;
+  border-color: #2d3148 !important;
+}
+
+body.dashboard-body.dark span[style*="color: #212529"] {
+  color: #e2e8f0 !important;
+}
+
+/* ── Form Controls ────────────────────────────────── */
+body.dashboard-body.dark .form-label {
+  color: #94a3b8;
+}
+
+body.dashboard-body.dark .form-input,
+body.dashboard-body.dark .form-select,
+body.dashboard-body.dark .form-textarea,
+body.dashboard-body.dark .search-input,
+body.dashboard-body.dark .filter-select {
+  background: #111827;
+  border-color: #374151;
+  color: #e2e8f0;
+}
+
+body.dashboard-body.dark .form-input::placeholder,
+body.dashboard-body.dark .form-textarea::placeholder,
+body.dashboard-body.dark .search-input::placeholder {
+  color: #4b5563;
+}
+
+body.dashboard-body.dark .form-input:focus,
+body.dashboard-body.dark .form-select:focus,
+body.dashboard-body.dark .form-textarea:focus,
+body.dashboard-body.dark .search-input:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+}
+
+body.dashboard-body.dark .form-input--with-dot {
+  background: #111827;
+  border-color: #374151;
+  color: #e2e8f0;
+}
+
+body.dashboard-body.dark .search-wrap i {
+  color: #64748b;
+}
+
+/* ── Status Dropdown ──────────────────────────────── */
+body.dashboard-body.dark .status-dropdown-trigger {
+  background: #111827;
+  border-color: #374151;
+  color: #e2e8f0;
+}
+
+body.dashboard-body.dark .status-dropdown-trigger:hover,
+body.dashboard-body.dark .status-dropdown-trigger:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+}
+
+body.dashboard-body.dark .status-dropdown-menu {
+  background: #1e2235;
+  border-color: #374151;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+body.dashboard-body.dark .status-dropdown-option {
+  color: #e2e8f0;
+}
+
+/* ── User Cards ────────────────────────────────────── */
+body.dashboard-body.dark .user-card {
+  background: #1a1d27;
+  border-color: #2d3148;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.dashboard-body.dark .user-card-id {
+  color: #e2e8f0;
+}
+
+body.dashboard-body.dark .user-card-name {
+  color: #94a3b8;
+}
+
+body.dashboard-body.dark .user-card-ssn {
+  color: #64748b;
+}
+
+body.dashboard-body.dark .user-card-meta {
+  color: #64748b;
+}
+
+/* ── New User Dropdown ─────────────────────────────── */
+body.dashboard-body.dark .new-user-dropdown {
+  background: #1e2235;
+  border-color: #2d3148;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+body.dashboard-body.dark .new-user-dropdown a {
+  color: #e2e8f0;
+}
+
+body.dashboard-body.dark .new-user-dropdown a:hover {
+  background: #2d3148;
+}
+
+/* ── Readonly / disabled form inputs ──────────────── */
+body.dashboard-body.dark .form-input[readonly],
+body.dashboard-body.dark input[readonly] {
+  background: #1a1d27 !important;
+  color: #64748b;
+  border-color: #374151;
+}
+
+/* ── Students Bulk Management Table ───────────────── */
+body.dashboard-body.dark .modal-box table th {
+  background: #252a3d;
+  color: #c4b5fd;
+  border-color: #374151;
+}
+
+body.dashboard-body.dark .modal-box table td {
+  color: #94a3b8;
+  border-color: #2d3148;
+}
+
+body.dashboard-body.dark .modal-box table tr:nth-child(even) {
+  background: #1e2235;
+}
+
+body.dashboard-body.dark .modal-box table tr:hover {
+  background: #2d3148;
+}
+
+body.dashboard-body.dark .status-dropdown-option:hover {
+  background: #2d3148;
+}
+
+
+body.dashboard-body.dark .status-dropdown-option.selected {
+  background: rgba(124, 58, 237, 0.15);
+}
+
+body.dashboard-body.dark .status-dropdown-chevron {
+  color: #64748b;
+}
+
+/* ── Tabs ─────────────────────────────────────────── */
+body.dashboard-body.dark .tab {
+  background: #1a1d27;
+  color: #94a3b8;
+  border-color: #2d3148;
+}
+
+body.dashboard-body.dark .tab:hover {
+  background: #2d3148;
+  color: #e2e8f0;
+}
+
+body.dashboard-body.dark .tab.active {
+  background: #6f42c1;
+  color: #fff;
+  border-color: #6f42c1;
+}
+
+/* ── Buttons ──────────────────────────────────────── */
+body.dashboard-body.dark .btn-primary {
+  background: #6f42c1;
+  color: #fff;
+}
+
+body.dashboard-body.dark .btn-primary:hover {
+  background: #5a32a3;
+}
+
+body.dashboard-body.dark .btn-link {
+  color: #a78bfa;
+}
+
+body.dashboard-body.dark .btn-link:hover {
+  color: #c4b5fd;
+}
+
+/* ── Pagination ───────────────────────────────────── */
+body.dashboard-body.dark .pagination button,
+body.dashboard-body.dark .pagination a {
+  background: #1a1d27;
+  border-color: #2d3148;
+  color: #94a3b8;
+}
+
+body.dashboard-body.dark .pagination button:hover:not(:disabled),
+body.dashboard-body.dark .pagination a:hover {
+  background: #2d3148;
+  color: #e2e8f0;
+}
+
+body.dashboard-body.dark .pagination .active {
+  background: #6f42c1;
+  color: #fff;
+  border-color: #6f42c1;
+}
+
+/* ── Reply list ───────────────────────────────────── */
+body.dashboard-body.dark .reply-item {
+  background: #111827;
+  border-color: #2d3148;
+}
+
+body.dashboard-body.dark .reply-meta {
+  color: #64748b;
+}
+
+body.dashboard-body.dark .reply-text {
+  color: #94a3b8;
+}
+
+/* ── Info grid ────────────────────────────────────── */
+body.dashboard-body.dark .info-item label {
+  color: #64748b;
+}
+
+body.dashboard-body.dark .info-item .value {
+  color: #e2e8f0;
+}
+
+/* ── Collapsible header (native class) ───────────── */
+body.dashboard-body.dark .collapsible-header {
+  color: #e2e8f0;
+  border-color: #2d3148;
+}
+
+body.dashboard-body.dark .collapsible-header:hover {
+  background: #2d3148;
+}
+
+/* ── Toast notifications ──────────────────────────── */
+body.dashboard-body.dark .toast {
+  background: #1e2235;
+  border-color: #2d3148;
+  color: #e2e8f0;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Modals ───────────────────────────────────────── */
+body.dashboard-body.dark .modal-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+body.dashboard-body.dark .modal-box {
+  background: #1e2235;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+body.dashboard-body.dark .modal-title {
+  color: #e2e8f0;
+}
+
+body.dashboard-body.dark .modal-message {
+  color: #94a3b8;
+}
+
+body.dashboard-body.dark .modal-btn--cancel {
+  background: #2d3148;
+  color: #94a3b8;
+}
+
+body.dashboard-body.dark .modal-btn--cancel:hover {
+  background: #374151;
+}
+
+/* Confirm modal */
+body.dashboard-body.dark .confirm-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+body.dashboard-body.dark .confirm-modal {
+  background: #1e2235;
+  color: #e2e8f0;
+}
+
+/* ── User card (users page) ───────────────────────── */
+body.dashboard-body.dark .user-card {
+  background: #1a1d27;
+  border-color: #2d3148;
+}
+
+/* ── Legend (filters bar) ─────────────────────────── */
+body.dashboard-body.dark .legend {
+  color: #64748b;
+}
+
+/* ── Sidebar footer divider ───────────────────────── */
+body.dashboard-body.dark .sidebar-footer {
+  border-top-color: #2d3148;
+}
+
+/* ── Inner message cards (admin messages section) ─── */
+body.dashboard-body.dark div[style*="background: #f8f9fa"]:not(body) {
+  background: #1e2235 !important;
+}
+
+body.dashboard-body.dark div[style*="background: #fff"]:not(.modal-box):not(body) {
+  background: #1a1d27 !important;
+}
+
+body.dashboard-body.dark div[style*="border-bottom: 1px solid #f0f0f0"] {
+  border-bottom-color: #2d3148 !important;
+}
+
+/* ── Footer ───────────────────────────────────────── */
+body.dashboard-body.dark footer {
+  border-top-color: #2d3148;
+  color: #4b5563;
+}
+
+/* ── Scrollbar (Webkit) ───────────────────────────── */
+body.dashboard-body.dark ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+body.dashboard-body.dark ::-webkit-scrollbar-track {
+  background: #0f1117;
+}
+
+body.dashboard-body.dark ::-webkit-scrollbar-thumb {
+  background: #2d3148;
+  border-radius: 3px;
+}
+
+body.dashboard-body.dark ::-webkit-scrollbar-thumb:hover {
+  background: #374151;
+}
+
+/* =====================================================
+   DARK MODE TOGGLE BUTTON
+   ===================================================== */
+
+.theme-toggle-btn {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-right: 4px;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(111, 66, 193, 0.12);
+}
+
+body.dashboard-body.dark .theme-toggle-btn:hover {
+  background: rgba(167, 139, 250, 0.15);
+}
+
+.theme-toggle-icon {
+  position: absolute;
+  font-size: 1.25rem;
+  transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  line-height: 1;
+}
+
+/* Sun icon (light mode) */
+.theme-icon-sun {
+  color: #f59e0b;
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+/* Moon icon — hidden in light mode */
+.theme-icon-moon {
+  color: #818cf8;
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.6);
+}
+
+/* When dark mode is ON */
+body.dashboard-body.dark .theme-icon-sun {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.6);
+}
+
+body.dashboard-body.dark .theme-icon-moon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+/* --- Header Logo Tray Dark Mode --- */
+body.dashboard-body.dark .header-logo-tray {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dashboard-body.dark .tray-logo {
+  border-color: #1a1d27;
+  background: #fff;
+}
+
+body.dashboard-body.dark .sidebar-header {
+  border-bottom-color: #2d3148;
 }
