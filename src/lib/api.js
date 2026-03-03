@@ -202,18 +202,22 @@ export const TicketAPI = {
   getAdminAllTickets(pageIndex = 1, pageSize = 10) {
     return request(`/api/Tickets/all?pageIndex=${pageIndex}&pageSize=${pageSize}`);
   },
-  getAdminAnalytics(period = null) {
-    const url = period ? `/api/Analytics/admin?period=${period}` : '/api/Analytics/admin';
-    return request(url);
+  getAdminAnalytics(period = null, program = null) {
+    const params = new URLSearchParams();
+    if (period) params.set('period', period);
+    if (program) params.set('program', program);
+    return request(`/api/Analytics/admin${params.toString() ? `?${params}` : ''}`);
   },
-  getTopDoctors(count = 10, level = null) {
+  getTopDoctors(count = 10, level = null, program = null) {
     const params = new URLSearchParams({ count });
     if (level) params.set('level', level);
+    if (program) params.set('program', program);
     return request(`/api/Analytics/top-doctors?${params}`);
   },
-  getTopSubjects(count = 10, level = null) {
+  getTopSubjects(count = 10, level = null, program = null) {
     const params = new URLSearchParams({ count });
     if (level) params.set('level', level);
+    if (program) params.set('program', program);
     return request(`/api/Analytics/top-subjects?${params}`);
   },
   getAdminMessages(pageIndex = 1, pageSize = 20) {
@@ -239,8 +243,11 @@ export const TicketAPI = {
   addCourse({ courseId, courseName }) {
     return Promise.reject(new Error('Add course is not supported. Use Assign Subjects to Doctor.'));
   },
-  deleteAllTickets() {
-    return Promise.reject(new Error('Bulk delete is not supported by the API.'));
+  endTerm() {
+    return request('/api/Admin/end-term', { method: 'POST' });
+  },
+  undoEndTerm() {
+    return request('/api/Admin/undo-end-term', { method: 'POST' });
   },
   clearAuth() {
     try {

@@ -4,8 +4,8 @@ import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-const STATUS_MAP = { 1: 'blue', 2: 'orange', 3: 'green' };
-const STATUS_LABELS = { 1: 'New', 2: 'On-Going', 3: 'Resolved' };
+const STATUS_MAP = { 1: 'blue', 2: 'orange', 3: 'green', 4: 'red' };
+const STATUS_LABELS = { 1: 'New', 2: 'On-Going', 3: 'Resolved', 4: 'Rejected' };
 
 function formatDate(d) {
   if (!d) return '';
@@ -36,7 +36,7 @@ function AdminTicketsContent() {
     const filter = {
       pageIndex: pageParam,
       pageSize: 10,
-      status: statusFilter === 'new' ? 1 : statusFilter === 'ongoing' ? 2 : statusFilter === 'resolved' ? 3 : undefined,
+      status: statusFilter === 'new' ? 1 : statusFilter === 'ongoing' ? 2 : statusFilter === 'resolved' ? 3 : statusFilter === 'rejected' ? 4 : undefined,
       searchTicketId: searchInput.trim() || undefined,
     };
     window.TicketAPI.getAdminFilteredTickets(filter)
@@ -85,6 +85,7 @@ function AdminTicketsContent() {
           <span className="legend-item"><span className="legend-dot blue"></span> New Tickets</span>
           <span className="legend-item"><span className="legend-dot orange"></span> On-Going Tickets</span>
           <span className="legend-item"><span className="legend-dot green"></span> Resolved Tickets</span>
+          <span className="legend-item"><span className="legend-dot red"></span> Rejected Tickets</span>
         </div>
         <select className="filter-select" aria-label="Time filter">
           <option>This Week</option>
@@ -97,6 +98,7 @@ function AdminTicketsContent() {
         <Link href="/administrator/tickets?status=new" className={tabClass('new')}><i className="fas fa-envelope"></i> New</Link>
         <Link href="/administrator/tickets?status=ongoing" className={tabClass('ongoing')}><i className="fas fa-sync-alt"></i> On-Going</Link>
         <Link href="/administrator/tickets?status=resolved" className={tabClass('resolved')}><i className="fas fa-check"></i> Resolved</Link>
+        <Link href="/administrator/tickets?status=rejected" className={tabClass('rejected')}><i className="fas fa-ban"></i> Rejected</Link>
       </div>
       {loading && <p style={{ textAlign: 'center', padding: 24 }}><i className="fas fa-spinner fa-spin"></i> Loading...</p>}
       {error && <p role="alert" style={{ color: '#dc3545', padding: 16 }}>{error}</p>}

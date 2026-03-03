@@ -5,11 +5,12 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { showToast } from '../../../../utils/toast';
 
-const STATUS_MAP = { 1: 'blue', 2: 'orange', 3: 'green' };
-const STATUS_LABELS = { 1: 'New', 2: 'On-Going', 3: 'Resolved' };
+const STATUS_MAP = { 1: 'blue', 2: 'orange', 3: 'green', 4: 'red' };
+const STATUS_LABELS = { 1: 'New', 2: 'On-Going', 3: 'Resolved', 4: 'Rejected' };
 const STATUS_OPTIONS = [
   { value: 2, label: 'On-Going Tickets', dot: 'orange' },
   { value: 3, label: 'Resolved Tickets', dot: 'green' },
+  { value: 4, label: 'Rejected Tickets', dot: 'red' },
 ];
 
 function formatDate(d) {
@@ -45,7 +46,7 @@ export default function DoctorTicketDetail() {
       .then((data) => {
         setTicket(data);
         const s = data?.status ?? data?.Status ?? 1;
-        setStatusValue(s === 3 ? 3 : 2);
+        setStatusValue([2, 3, 4].includes(s) ? s : 2);
       })
       .catch((err) => setError((err && err.message) ? err.message : 'Failed to load ticket.'))
       .finally(() => setLoading(false));

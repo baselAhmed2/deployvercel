@@ -5,8 +5,8 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { showToast } from '../../../../utils/toast';
 
-const STATUS_MAP = { 1: 'blue', 2: 'orange', 3: 'green' };
-const STATUS_LABELS = { 1: 'Not Replied', 2: 'On-Going', 3: 'Resolved' };
+const STATUS_MAP = { 1: 'blue', 2: 'orange', 3: 'green', 4: 'red' };
+const STATUS_LABELS = { 1: 'Not Replied', 2: 'On-Going', 3: 'Resolved', 4: 'Rejected' };
 
 function formatDate(d) {
   if (!d) return '';
@@ -190,6 +190,7 @@ export default function StudentTicketDetailPage() {
         </div>
       )}
       {!canReply && status === 3 && <p style={{ color: '#666', padding: 16 }}>This ticket is resolved. You cannot add more replies.</p>}
+      {!canReply && status === 4 && <p style={{ color: '#842029', padding: 16, background: '#f8d7da', borderRadius: 8 }}>This ticket has been <strong>rejected</strong>. You cannot add more replies.</p>}
       <Link href="/student" className="btn-primary" style={{ marginTop: 16 }}>Back to Tickets</Link>
     </>
   );

@@ -148,7 +148,7 @@ function CollapsibleSection({ title, icon, iconColor, defaultOpen = false, onOpe
 
 /* ─── Main Component ─────────────────────────────────────────────── */
 export default function AdminDashboard() {
-  const [stats, setStats] = useState({ new: 0, inProgress: 0, closed: 0 });
+  const [stats, setStats] = useState({ new: 0, inProgress: 0, closed: 0, rejected: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -191,6 +191,7 @@ export default function AdminDashboard() {
           new: dist['New'] ?? dist['1'] ?? 0,
           inProgress: dist['InProgress'] ?? dist['2'] ?? 0,
           closed: dist['Closed'] ?? dist['3'] ?? 0,
+          rejected: dist['Rejected'] ?? dist['4'] ?? 0,
         });
       })
       .catch((err) => setError((err && err.message) ? err.message : 'Failed to load.'))
@@ -313,6 +314,12 @@ export default function AdminDashboard() {
           <div className="stat-card-label">Closed</div>
           <span className="stat-card-link">View entire list</span>
           <div className="stat-card-illus" aria-hidden="true"><i className="fas fa-check-circle"></i></div>
+        </Link>
+        <Link href="/administrator/tickets?status=rejected" className="stat-card red">
+          <div className="stat-card-value">{stats.rejected}</div>
+          <div className="stat-card-label">Rejected</div>
+          <span className="stat-card-link">View entire list</span>
+          <div className="stat-card-illus" aria-hidden="true"><i className="fas fa-times-circle"></i></div>
         </Link>
       </div>
 

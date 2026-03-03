@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { showConfirm } from '../../utils/confirmModal';
 import { TicketAPI } from '../../api';
 
 const STATUS_DOT = { New: 'blue', InProgress: 'orange', Closed: 'green' };
 const STATUS_LABEL = { 0: 'New', 1: 'InProgress', 2: 'Closed' };
 
 export default function AdminDashboard() {
-  const [deleting, setDeleting] = useState(false);
   const [stats, setStats] = useState({ newTickets: 0, inProgressTickets: 0, closedTickets: 0, totalTickets: 0 });
   const [myTickets, setMyTickets] = useState(null); // null = loading
 
@@ -28,21 +26,6 @@ export default function AdminDashboard() {
       })
       .catch(() => setMyTickets([]));
   }, []);
-
-  const handleDeleteTickets = () => {
-    showConfirm({
-      title: 'Delete all tickets?',
-      message: 'Delete all tickets data? This cannot be undone. Users will be kept.',
-      confirmText: 'Delete',
-      cancelText: 'Cancel',
-    }).then((ok) => {
-      if (!ok) return;
-      setDeleting(true);
-      if (window.TicketAPI && window.TicketAPI.deleteAllTickets) {
-        window.TicketAPI.deleteAllTickets().finally(() => setDeleting(false));
-      } else setDeleting(false);
-    });
-  };
 
   const statusDot = (ticket) => {
     const s = typeof ticket.status === 'number' ? STATUS_LABEL[ticket.status] : ticket.status;
@@ -129,20 +112,6 @@ export default function AdminDashboard() {
           ))}
         </div>
       )}
-
-      <div className="detail-card danger-card">
-        <div>
-          <div className="danger-card-title"><i className="fas fa-info-circle"></i> Delete all Tickets Data</div>
-          <p className="danger-card-note">Ensure: Delete Include All Data <span className="except">Except Users</span></p>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span className="danger-card-meta">Created At 22-11-2024</span>
-          <button type="button" className="btn-danger" onClick={handleDeleteTickets} disabled={deleting}>
-            <i className="fas fa-trash-alt"></i> Delete Tickets
-          </button>
-        </div>
-      </div>
     </>
   );
 }
-

@@ -7,6 +7,7 @@ export default function AdminAnalysis() {
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [program, setProgram] = useState('');
   const [doctorLevel, setDoctorLevel] = useState('');
   const [subjectLevel, setSubjectLevel] = useState('');
   const [topDoctors, setTopDoctors] = useState([]);
@@ -14,13 +15,17 @@ export default function AdminAnalysis() {
   const [loadingDoctors, setLoadingDoctors] = useState(false);
   const [loadingSubjects, setLoadingSubjects] = useState(false);
 
-  useEffect(() => {
-    if (typeof window.TicketAPI === 'undefined' || !window.TicketAPI.getAdminAnalytics) {
-      setLoading(false);
-      setError('API is not available.');
-      return;
-    }
-    window.TicketAPI.getAdminAnalytics()
+  const PROGRAMS = [
+    { value: '', label: 'All Programs' },
+    { value: 'BIS', label: 'BIS' },
+    { value: 'FMI', label: 'FMI' },
+    { value: 'SBS', label: 'SBS' },
+  ];
+
+  const fetchAnalytics = useCallback((prog) => {
+    if (typeof window.TicketAPI === 'undefined' || !window.TicketAPI.getAdminAnalytics) return;
+    setLoading(true);
+    window.TicketAPI.getAdminAnalytics(null, prog || null)
       .then((data) => {
         setAnalytics(data);
         setTopDoctors(data?.topDoctorsByTickets ?? data?.TopDoctorsByTickets ?? []);
@@ -30,34 +35,45 @@ export default function AdminAnalysis() {
       .finally(() => setLoading(false));
   }, []);
 
-  const fetchTopDoctors = useCallback((level) => {
+  useEffect(() => { fetchAnalytics(''); }, [fetchAnalytics]);
+
+  const handleProgramChange = (prog) => {
+    setProgram(prog);
+    setDoctorLevel('');
+    setSubjectLevel('');
+    fetchAnalytics(prog);
+    fetchTopDoctors(null, prog);
+    fetchTopSubjects(null, prog);
+  };
+
+  const fetchTopDoctors = useCallback((level, prog) => {
     if (!window.TicketAPI?.getTopDoctors) return;
     setLoadingDoctors(true);
-    window.TicketAPI.getTopDoctors(10, level || null)
+    window.TicketAPI.getTopDoctors(10, level || null, (prog ?? program) || null)
       .then(setTopDoctors)
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoadingDoctors(false));
-  }, []);
+  }, [program]);
 
-  const fetchTopSubjects = useCallback((level) => {
+  const fetchTopSubjects = useCallback((level, prog) => {
     if (!window.TicketAPI?.getTopSubjects) return;
     setLoadingSubjects(true);
-    window.TicketAPI.getTopSubjects(10, level || null)
+    window.TicketAPI.getTopSubjects(10, level || null, (prog ?? program) || null)
       .then(setTopSubjects)
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoadingSubjects(false));
-  }, []);
+  }, [program]);
 
   const handleDoctorLevelChange = (e) => {
     const val = e.target.value;
     setDoctorLevel(val);
-    fetchTopDoctors(val);
+    fetchTopDoctors(val, program);
   };
 
   const handleSubjectLevelChange = (e) => {
     const val = e.target.value;
     setSubjectLevel(val);
-    fetchTopSubjects(val);
+    fetchTopSubjects(val, program);
   };
 
   if (loading) {
@@ -74,6 +90,7 @@ export default function AdminAnalysis() {
   const newCount = dist['New'] ?? dist['1'] ?? 0;
   const inProgressCount = dist['InProgress'] ?? dist['2'] ?? 0;
   const closedCount = dist['Closed'] ?? dist['3'] ?? 0;
+  const rejectedCount = dist['Rejected'] ?? dist['4'] ?? 0;
   const totalTickets = analytics?.totalTickets ?? analytics?.TotalTickets ?? 0;
   const totalUsers = analytics?.totalUsers ?? analytics?.TotalUsers ?? 0;
   const totalDoctors = analytics?.totalDoctors ?? analytics?.TotalDoctors ?? 0;
@@ -89,7 +106,20 @@ export default function AdminAnalysis() {
 
   return (
     <>
-      <h1 className="page-title">Analysis</h1>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
+        <h1 className="page-title" style={{ margin: 0 }}>Analysis</h1>
+        <select
+          className="form-select"
+          style={{ width: 'auto', minWidth: 160 }}
+          value={program}
+          onChange={(e) => handleProgramChange(e.target.value)}
+          aria-label="Filter by program"
+        >
+          {PROGRAMS.map((p) => (
+            <option key={p.value} value={p.value}>{p.label}</option>
+          ))}
+        </select>
+      </div>
       {error && <p role="alert" style={{ color: '#dc3545', padding: 16 }}>{error}</p>}
       <div className="detail-card">
         <h2 className="section-title">Ticket Statistics</h2>
@@ -109,6 +139,11 @@ export default function AdminAnalysis() {
             <div className="stat-card-value">{closedCount}</div>
             <div className="stat-card-label">Closed</div>
             <div className="stat-card-illus" aria-hidden="true"><i className="fas fa-check-circle"></i></div>
+          </Link>
+          <Link href="/administrator/tickets?status=rejected" className="stat-card" style={{ background: 'linear-gradient(135deg,#ef4444,#b91c1c)', color: '#fff' }}>
+            <div className="stat-card-value">{rejectedCount}</div>
+            <div className="stat-card-label">Rejected</div>
+            <div className="stat-card-illus" aria-hidden="true"><i className="fas fa-ban"></i></div>
           </Link>
         </div>
       </div>
@@ -141,6 +176,7 @@ export default function AdminAnalysis() {
                 <th style={{ padding: '8px 4px' }}>New</th>
                 <th style={{ padding: '8px 4px' }}>In Progress</th>
                 <th style={{ padding: '8px 4px' }}>Closed</th>
+                <th style={{ padding: '8px 4px' }}>Rejected</th>
               </tr>
             </thead>
             <tbody>
@@ -152,6 +188,7 @@ export default function AdminAnalysis() {
                   <td style={{ padding: '8px 4px', color: '#20c997' }}>{d.newCount ?? d.NewCount ?? 0}</td>
                   <td style={{ padding: '8px 4px', color: '#ffc107' }}>{d.inProgressCount ?? d.InProgressCount ?? 0}</td>
                   <td style={{ padding: '8px 4px', color: '#e83e8c' }}>{d.closedCount ?? d.ClosedCount ?? 0}</td>
+                  <td style={{ padding: '8px 4px', color: '#dc3545' }}>{d.rejectedCount ?? d.RejectedCount ?? 0}</td>
                 </tr>
               ))}
             </tbody>

@@ -473,6 +473,10 @@ body.dashboard-body {
   background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
 }
 
+.stat-card.red {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+}
+
 .stat-card-value {
   font-size: 2rem;
   font-weight: 700;

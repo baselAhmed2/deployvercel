@@ -4,8 +4,8 @@ import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-const STATUS_MAP = { 1: 'blue', 2: 'orange', 3: 'green' };
-const STATUS_LABELS = { 1: 'Not Replied', 2: 'On-Going', 3: 'Resolved' };
+const STATUS_MAP = { 1: 'blue', 2: 'orange', 3: 'green', 4: 'red' };
+const STATUS_LABELS = { 1: 'Not Replied', 2: 'On-Going', 3: 'Resolved', 4: 'Rejected' };
 
 function formatDate(d) {
   if (!d) return '';
@@ -40,6 +40,7 @@ function StudentTicketsContent() {
         if (statusFilter === 'not-replied') filtered = items.filter((t) => (t.status ?? t.Status) === 1);
         else if (statusFilter === 'ongoing') filtered = items.filter((t) => (t.status ?? t.Status) === 2);
         else if (statusFilter === 'resolved') filtered = items.filter((t) => (t.status ?? t.Status) === 3);
+        else if (statusFilter === 'rejected') filtered = items.filter((t) => (t.status ?? t.Status) === 4);
         setTickets(filtered);
         setPagination({
           pageIndex: res?.pageIndex ?? res?.PageIndex ?? pageParam,
@@ -86,6 +87,7 @@ function StudentTicketsContent() {
           <span className="legend-item"><span className="legend-dot blue"></span> Not Replied</span>
           <span className="legend-item"><span className="legend-dot orange"></span> On-Going Tickets</span>
           <span className="legend-item"><span className="legend-dot green"></span> Resolved Tickets</span>
+          <span className="legend-item"><span className="legend-dot red"></span> Rejected Tickets</span>
         </div>
         <select className="filter-select" aria-label="Time filter">
           <option>This Week</option>
@@ -100,7 +102,8 @@ function StudentTicketsContent() {
         <Link href="/student" className={`tab ${!statusFilter ? 'active' : ''}`}><i className="fas fa-envelope"></i> All Tickets</Link>
         <Link href="/student?status=not-replied" className={`tab ${statusFilter === 'not-replied' ? 'active' : ''}`}><i className="fas fa-envelope"></i> Not Replied</Link>
         <Link href="/student?status=ongoing" className={`tab ${statusFilter === 'ongoing' ? 'active' : ''}`}><i className="fas fa-envelope"></i> On-Going</Link>
-        <Link href="/student?status=resolved" className={`tab ${statusFilter === 'resolved' ? 'active' : ''}`}><i className="fas fa-envelope"></i> Resolved</Link>
+        <Link href="/student?status=resolved" className={`tab ${statusFilter === 'resolved' ? 'active' : ''}`}><i className="fas fa-check"></i> Resolved</Link>
+        <Link href="/student?status=rejected" className={`tab ${statusFilter === 'rejected' ? 'active' : ''}`}><i className="fas fa-ban"></i> Rejected</Link>
       </div>
       {loading && <p style={{ textAlign: 'center', padding: 24 }}><i className="fas fa-spinner fa-spin"></i> Loading...</p>}
       {error && <p role="alert" style={{ color: '#dc3545', padding: 16 }}>{error}</p>}

@@ -37,8 +37,11 @@ export default function AdminSiteSettings() {
 
   useEffect(() => () => clearTimer(), [clearTimer]);
 
-  const handleFirstClick = () => {
+  const [activeAction, setActiveAction] = useState(null); // 'end-term' or 'delete-all'
+
+  const handleFirstClick = (action) => {
     setPhase('countdown');
+    setActiveAction(action);
     setCountdown(COUNTDOWN_SECONDS);
     clearTimer();
     timerRef.current = setInterval(() => {
@@ -57,23 +60,37 @@ export default function AdminSiteSettings() {
   const handleCancel = () => {
     clearTimer();
     setPhase('idle');
+    setActiveAction(null);
     setCountdown(COUNTDOWN_SECONDS);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmAction = () => {
     if (typeof window.TicketAPI === 'undefined') {
       showToast('API is not available.', 'error');
       return;
     }
     setDeleting(true);
 
-    const api = window.TicketAPI;
-    const deleteAll = async () => {
+    const executeAction = async () => {
       try {
+        let endpoint = '';
+        let method = '';
+
+        if (activeAction === 'end-term') {
+          endpoint = 'api/Admin/end-term';
+          method = 'POST';
+        } else if (activeAction === 'undo-end-term') {
+          endpoint = 'api/Admin/undo-end-term';
+          method = 'POST';
+        } else if (activeAction === 'delete-all') {
+          endpoint = 'api/Admin/delete-all';
+          method = 'DELETE';
+        }
+
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, '')}/api/Admin/end-term`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, '')}/${endpoint}`,
           {
-            method: 'POST',
+            method: method,
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -82,25 +99,35 @@ export default function AdminSiteSettings() {
         );
 
         if (!response.ok) {
-          throw new Error('Failed to delete tickets. Ensure you have the correct permissions.');
+          throw new Error('Failed to perform action. Ensure you have the correct permissions.');
         }
 
         const data = await response.json();
-        const count = data.deletedCount || 0;
-        showToast(`Successfully deleted ${count} ticket(s). All data cleared.`);
+        if (activeAction === 'end-term') {
+          const count = data.hiddenCount || 0;
+          showToast(`Successfully ended term. Hidden ${count} ticket(s) from doctors.`);
+        } else if (activeAction === 'undo-end-term') {
+          const count = data.unhiddenCount || 0;
+          showToast(`Successfully restored term. Restored visibility of ${count} ticket(s) to doctors.`, 'success');
+        } else {
+          const count = data.deletedCount || 0;
+          showToast(`Successfully deleted ${count} ticket(s). All data permanently cleared.`);
+        }
       } catch (err) {
-        showToast((err && err.message) ? err.message : 'Failed to delete tickets.', 'error');
+        showToast((err && err.message) ? err.message : 'Failed to perform action.', 'error');
       }
       setPhase('idle');
+      setActiveAction(null);
       setDeleting(false);
       setCountdown(COUNTDOWN_SECONDS);
     };
 
-    deleteAll();
+    executeAction();
   };
 
   const userRole = typeof window !== 'undefined' ? localStorage.getItem('userRole') : null;
   const isSuperAdmin = userRole === 'SuperAdmin';
+  const progressPct = (countdown / COUNTDOWN_SECONDS) * 100;
 
   return (
     <>
@@ -144,7 +171,7 @@ export default function AdminSiteSettings() {
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
         }}>
           <i className="fas fa-spinner fa-spin" style={{ fontSize: '3rem', color: '#dc3545', marginBottom: 16 }}></i>
-          <h2 style={{ color: '#dc3545', margin: 0 }}>Deleting everything...</h2>
+          <h2 style={{ color: '#dc3545', margin: 0 }}>Processing action...</h2>
           <p style={{ color: dark ? '#94a3b8' : '#666', marginTop: 8 }}>Please do not close this window.</p>
         </div>
       )}
@@ -170,7 +197,124 @@ export default function AdminSiteSettings() {
         </button>
       </div>
 
-      {/* Danger Zone */}
+      {/* Danger Zone: End Term (Hide Tickets) */}
+      {isSuperAdmin && (
+        <div className="detail-card" style={{ marginBottom: 24, borderLeft: '4px solid #fd7e14' }}>
+          <div>
+            <div className="danger-card-title" style={{ color: '#fd7e14' }}>
+              <i className="fas fa-calendar-times" style={{ marginRight: 8 }}></i>
+              Term Management
+            </div>
+            <p className="danger-card-note" style={{ color: dark ? '#94a3b8' : '#6c757d' }}>
+              <strong style={{ color: '#fd7e14' }}>Ending the Term</strong> hides all existing tickets from doctors so you start the next term clean. Tickets are NOT deleted. You can <strong style={{ color: '#20c997' }}>Undo</strong> this action if needed.
+            </p>
+          </div>
+
+          {phase === 'idle' && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 16 }}>
+              <button type="button" className="btn-primary" style={{ backgroundColor: '#fd7e14', borderColor: '#fd7e14' }} onClick={() => handleFirstClick('end-term')}>
+                <i className="fas fa-eye-slash"></i> Start New Term (Hide Tickets)
+              </button>
+              <button type="button" className="btn-primary" style={{ backgroundColor: '#20c997', borderColor: '#20c997' }} onClick={() => handleFirstClick('undo-end-term')}>
+                <i className="fas fa-undo"></i> Undo End Term (Show Tickets)
+              </button>
+            </div>
+          )}
+
+          {phase === 'countdown' && (activeAction === 'end-term' || activeAction === 'undo-end-term') && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 280, marginTop: 16 }}>
+              <div style={{
+                background: dark ? '#2d261c' : '#fff3cd',
+                border: `1px solid ${dark ? '#856404' : '#ffc107'}`,
+                borderRadius: 8,
+                padding: '16px 20px',
+                textAlign: 'center',
+              }}>
+                <p style={{ margin: '0 0 8px', fontWeight: 600, color: dark ? '#fbbf24' : '#856404' }}>
+                  <i className="fas fa-hourglass-half"></i> Please wait before confirming
+                </p>
+                <div style={{
+                  fontSize: '2.5rem',
+                  fontWeight: 700,
+                  color: countdown <= 5 ? '#ef4444' : (dark ? '#fbbf24' : '#856404'),
+                  fontVariantNumeric: 'tabular-nums',
+                }}>
+                  {countdown}s
+                </div>
+                <div style={{
+                  background: '#e9ecef',
+                  borderRadius: 4,
+                  height: 6,
+                  marginTop: 8,
+                  overflow: 'hidden',
+                }}>
+                  <div style={{
+                    height: '100%',
+                    background: countdown <= 5 ? '#dc3545' : '#ffc107',
+                    width: `${progressPct}%`,
+                    transition: 'width 1s linear, background 0.3s',
+                    borderRadius: 4,
+                  }} />
+                </div>
+              </div>
+              <button type="button" className="btn-primary" onClick={handleCancel} style={{ alignSelf: 'center' }}>
+                <i className="fas fa-times"></i> Cancel
+              </button>
+            </div>
+          )}
+
+          {phase === 'ready' && (activeAction === 'end-term' || activeAction === 'undo-end-term') && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 280, marginTop: 16 }}>
+              <div style={{
+                background: activeAction === 'end-term' ? (dark ? '#311b1d' : '#f8d7da') : (dark ? '#11221c' : '#d4edda'),
+                border: `1px solid ${activeAction === 'end-term' ? (dark ? '#991b1b' : '#dc3545') : (dark ? '#1b994d' : '#28a745')}`,
+                borderRadius: 8,
+                padding: '16px 20px',
+                textAlign: 'center',
+              }}>
+                <p style={{
+                  margin: '0 0 4px',
+                  fontWeight: 700,
+                  color: activeAction === 'end-term' ? (dark ? '#f87171' : '#721c24') : (dark ? '#4ade80' : '#155724'),
+                  fontSize: '1.1rem'
+                }}>
+                  <i className="fas fa-exclamation-circle"></i> Are you absolutely sure?
+                </p>
+                <p style={{
+                  margin: 0,
+                  color: activeAction === 'end-term' ? (dark ? '#fca5a5' : '#721c24') : (dark ? '#86efac' : '#155724'),
+                  fontSize: '0.9rem'
+                }}>
+                  {activeAction === 'end-term'
+                    ? "This will hide all tickets from doctors to start the new term."
+                    : "This will restore visibility of all hidden tickets back to the doctors."}
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+                <button type="button" className="btn-primary" onClick={handleCancel} disabled={deleting}>
+                  <i className="fas fa-times"></i> Cancel
+                </button>
+                <button type="button" className="btn-danger" onClick={handleConfirmAction} disabled={deleting} style={{
+                  animation: 'none',
+                  fontWeight: 700,
+                  backgroundColor: activeAction === 'end-term' ? '#fd7e14' : '#20c997',
+                  borderColor: activeAction === 'end-term' ? '#fd7e14' : '#20c997'
+                }}>
+                  {deleting ? (
+                    <><i className="fas fa-spinner fa-spin"></i> Processing...</>
+                  ) : (
+                    activeAction === 'end-term'
+                      ? <><i className="fas fa-eye-slash"></i> Yes, Hide Tickets</>
+                      : <><i className="fas fa-undo"></i> Yes, Restore Tickets</>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Danger Zone: Permanent Delete */}
       {isSuperAdmin && (
         <div className="detail-card danger-card">
           <div>
@@ -179,19 +323,19 @@ export default function AdminSiteSettings() {
               Delete all Tickets Data
             </div>
             <p className="danger-card-note">
-              Ensure: Delete Includes All Ticket Data <span className="except">Except Users</span>
+              Ensure: Delete Includes All Ticket Data <span className="except">Except Users</span>. This action permanently wipes data from the database.
             </p>
           </div>
 
           {phase === 'idle' && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <button type="button" className="btn-danger" onClick={handleFirstClick}>
-                <i className="fas fa-trash-alt"></i> Delete All Tickets
+              <button type="button" className="btn-danger" onClick={() => handleFirstClick('delete-all')}>
+                <i className="fas fa-trash-alt"></i> Delete All Tickets Permanently
               </button>
             </div>
           )}
 
-          {phase === 'countdown' && (
+          {phase === 'countdown' && activeAction === 'delete-all' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 280 }}>
               <div style={{
                 background: dark ? '#2d261c' : '#fff3cd',
@@ -233,7 +377,7 @@ export default function AdminSiteSettings() {
             </div>
           )}
 
-          {phase === 'ready' && (
+          {phase === 'ready' && activeAction === 'delete-all' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 280 }}>
               <div style={{
                 background: dark ? '#311b1d' : '#f8d7da',
@@ -253,7 +397,7 @@ export default function AdminSiteSettings() {
                 <button type="button" className="btn-primary" onClick={handleCancel} disabled={deleting}>
                   <i className="fas fa-times"></i> Cancel
                 </button>
-                <button type="button" className="btn-danger" onClick={handleConfirmDelete} disabled={deleting} style={{
+                <button type="button" className="btn-danger" onClick={handleConfirmAction} disabled={deleting} style={{
                   animation: 'none',
                   fontWeight: 700,
                 }}>

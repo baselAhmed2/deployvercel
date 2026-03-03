@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-const STATUS_MAP = { 1: 'blue', 2: 'orange', 3: 'green' };
-const STATUS_LABELS = { 1: 'New', 2: 'On-Going', 3: 'Resolved' };
+const STATUS_MAP = { 1: 'blue', 2: 'orange', 3: 'green', 4: 'red' };
+const STATUS_LABELS = { 1: 'New', 2: 'On-Going', 3: 'Resolved', 4: 'Rejected' };
 
 function formatDate(d) {
   if (!d) return '';
@@ -13,7 +13,7 @@ function formatDate(d) {
 }
 
 export default function DoctorDashboard() {
-  const [stats, setStats] = useState({ newTickets: 0, inProgressTickets: 0, closedTickets: 0, totalTickets: 0 });
+  const [stats, setStats] = useState({ newTickets: 0, inProgressTickets: 0, closedTickets: 0, rejectedTickets: 0, totalTickets: 0 });
   const [highPriorityTickets, setHighPriorityTickets] = useState([]);
   const [normalTickets, setNormalTickets] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,6 +35,7 @@ export default function DoctorDashboard() {
           newTickets: s.newTickets ?? s.NewTickets ?? 0,
           inProgressTickets: s.inProgressTickets ?? s.InProgressTickets ?? 0,
           closedTickets: s.closedTickets ?? s.ClosedTickets ?? 0,
+          rejectedTickets: s.rejectedTickets ?? s.RejectedTickets ?? 0,
           totalTickets: s.totalTickets ?? s.TotalTickets ?? 0,
         });
         const data = ticketsRes?.data ?? ticketsRes?.Data ?? [];
@@ -82,6 +83,12 @@ export default function DoctorDashboard() {
           <div className="stat-card-label">Closed</div>
           <span className="stat-card-link">View entire list</span>
           <div className="stat-card-illus" aria-hidden="true"><i className="fas fa-check-circle"></i></div>
+        </Link>
+        <Link href="/doctor/tickets?status=rejected" className="stat-card" style={{ background: 'linear-gradient(135deg,#ef4444,#b91c1c)', color: '#fff' }}>
+          <div className="stat-card-value">{stats.rejectedTickets}</div>
+          <div className="stat-card-label">Rejected</div>
+          <span className="stat-card-link">View entire list</span>
+          <div className="stat-card-illus" aria-hidden="true"><i className="fas fa-ban"></i></div>
         </Link>
       </div>
       <h2 className="section-heading">High Priority Tickets</h2>
