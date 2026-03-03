@@ -480,6 +480,41 @@ export default function AdminDashboard() {
             })}
           </div>
         )}
+
+        {/* Pagination */}
+        {messagesTotalPages > 1 && !loadingMessages && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 16 }}>
+            <button
+              type="button"
+              onClick={() => loadMessages(messagesPage - 1)}
+              disabled={messagesPage <= 1}
+              style={{
+                padding: '7px 14px', borderRadius: 7, border: `1px solid ${paginationBorder}`,
+                background: paginationBg, color: messagesPage <= 1 ? '#adb5bd' : '#6f42c1',
+                cursor: messagesPage <= 1 ? 'not-allowed' : 'pointer', fontWeight: 500, fontSize: '0.9rem',
+              }}
+            >
+              <i className="fas fa-chevron-left" style={{ marginRight: 4 }} /> Prev
+            </button>
+
+            <span style={{ fontSize: '0.9rem', color: paginationText, fontWeight: 500, padding: '0 8px' }}>
+              Page {messagesPage} / {messagesTotalPages}
+            </span>
+
+            <button
+              type="button"
+              onClick={() => loadMessages(messagesPage + 1)}
+              disabled={messagesPage >= messagesTotalPages}
+              style={{
+                padding: '7px 14px', borderRadius: 7, border: `1px solid ${paginationBorder}`,
+                background: paginationBg, color: messagesPage >= messagesTotalPages ? '#adb5bd' : '#6f42c1',
+                cursor: messagesPage >= messagesTotalPages ? 'not-allowed' : 'pointer', fontWeight: 500, fontSize: '0.9rem',
+              }}
+            >
+              Next <i className="fas fa-chevron-right" style={{ marginLeft: 4 }} />
+            </button>
+          </div>
+        )}
       </CollapsibleSection>
 
       {/* Recent Tickets */}
