@@ -108,8 +108,8 @@ function StudentTicketsContent() {
                     Search Student Tickets
                 </h2>
                 <p className="section-desc">Enter a Student ID to view their tickets and total ticket count.</p>
-                <form onSubmit={handleSearch} style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 12 }}>
-                    <div style={{ flex: 1, minWidth: 200, position: 'relative' }}>
+                <form onSubmit={handleSearch} style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 12, alignItems: 'stretch' }}>
+                    <div style={{ flex: '1 1 200px', minWidth: 0, position: 'relative' }}>
                         <i className="fas fa-id-card" style={{
                             position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
                             color: '#aaa', pointerEvents: 'none'
@@ -123,12 +123,14 @@ function StudentTicketsContent() {
                             onChange={(e) => { setStudentId(e.target.value); setErrorInput(false); }}
                             style={{
                                 paddingLeft: 36,
+                                width: '100%',
+                                boxSizing: 'border-box',
                                 borderColor: errorInput ? '#ef4444' : undefined,
                                 boxShadow: errorInput ? '0 0 0 3px rgba(239, 68, 68, 0.15)' : undefined,
                             }}
                         />
                     </div>
-                    <button type="submit" className="btn-primary" style={{ whiteSpace: 'nowrap' }}>
+                    <button type="submit" className="btn-primary" style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
                         <i className="fas fa-search" /> Search
                     </button>
                 </form>

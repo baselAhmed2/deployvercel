@@ -27,60 +27,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/administrator/student-tickets/page.js"
     ],
-    "/administrator/tickets/page": [
+    "/_not-found/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/administrator/tickets/page.js"
-    ],
-    "/administrator/users/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/administrator/users/page.js"
-    ],
-    "/administrator/add-subject/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/administrator/add-subject/page.js"
-    ],
-    "/administrator/add-course/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/administrator/add-course/page.js"
-    ],
-    "/administrator/analysis/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/administrator/analysis/page.js"
-    ],
-    "/administrator/site-settings/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/administrator/site-settings/page.js"
-    ],
-    "/administrator/ticket/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/administrator/ticket/[id]/page.js"
-    ],
-    "/doctor/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/doctor/page.js"
-    ],
-    "/doctor/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/doctor/layout.js"
-    ],
-    "/doctor/tickets/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/doctor/tickets/page.js"
-    ],
-    "/doctor/my-courses/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/doctor/my-courses/page.js"
+      "static/chunks/app/_not-found/page.js"
     ]
   }
 }
