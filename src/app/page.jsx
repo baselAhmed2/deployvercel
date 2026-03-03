@@ -31,9 +31,13 @@ function LoginForm() {
       window.TicketAPI.clearAuth();
     }
     const savedId = localStorage.getItem('rememberedStudentId');
+    const savedPassword = localStorage.getItem('rememberedPassword');
     if (savedId) {
       setStudentId(savedId);
       setRememberMe(true);
+      if (savedPassword) {
+        setPassword(savedPassword);
+      }
     }
   }, []);
 
@@ -69,8 +73,10 @@ function LoginForm() {
 
             if (rememberMe) {
               localStorage.setItem('rememberedStudentId', sid);
+              localStorage.setItem('rememberedPassword', pwd);
             } else {
               localStorage.removeItem('rememberedStudentId');
+              localStorage.removeItem('rememberedPassword');
             }
           } catch (_) { }
           router.push(roleToDashboardPath(role));
