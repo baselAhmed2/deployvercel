@@ -1,15 +1,58 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { showToast } from '../../../utils/toast';
+
+const STORAGE_KEY = 'ticket_last_choices';
+const LEVEL_KEY = 'ticket_student_level';
+const THREE_MONTHS_MS = 90 * 24 * 60 * 60 * 1000; // 90 يوم
+
+function loadSavedLevel() {
+  try {
+    const raw = localStorage.getItem(LEVEL_KEY);
+    if (!raw) return null;
+    const { value, savedAt } = JSON.parse(raw);
+    // تحقق إن المدة ما عدتش 3 شهور
+    if (Date.now() - savedAt < THREE_MONTHS_MS) return value;
+    localStorage.removeItem(LEVEL_KEY); // منتهي الصلاحية
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function saveLevel(value) {
+  try {
+    localStorage.setItem(LEVEL_KEY, JSON.stringify({ value, savedAt: Date.now() }));
+  } catch { }
+}
+
+function loadSavedChoices() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function saveChoices(choices) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(choices));
+  } catch { }
+}
 
 export default function StudentNewTicketPage() {
   const router = useRouter();
   const [sending, setSending] = useState(false);
-  const [level, setLevel] = useState('4');
+
+  // استرجع القيم المحفوظة، أو استخدم الـ default (level 1 للمرة الأولى)
+  const saved = useRef(null);
+  const [level, setLevel] = useState('1');
   const [term, setTerm] = useState('1');
-  const [groupNumber, setGroupNumber] = useState('1');
+  const [groupNumber, setGroupNumber] = useState('');
   const [subjectId, setSubjectId] = useState('');
   const [doctorId, setDoctorId] = useState('');
   const [title, setTitle] = useState('');
@@ -20,6 +63,23 @@ export default function StudentNewTicketPage() {
   const [loadingSubjects, setLoadingSubjects] = useState(false);
   const [loadingDoctors, setLoadingDoctors] = useState(false);
 
+  // تحميل الاختيارات المحفوظة عند أول تحميل للصفحة
+  useEffect(() => {
+    // Level: مع صلاحية 3 شهور
+    const savedLevel = loadSavedLevel();
+    if (savedLevel) setLevel(savedLevel);
+
+    // باقي الاختيارات بدون صلاحية (تُحفظ لكل submit)
+    const prev = loadSavedChoices();
+    if (prev) {
+      saved.current = prev;
+      if (prev.term) setTerm(prev.term);
+      if (prev.groupNumber) setGroupNumber(prev.groupNumber);
+      // subjectId و doctorId يُستعادان بعد تحميل قوائم المواد والدكاترة
+    }
+  }, []);
+
+  // تحميل المواد عند تغيير اللفل أو الترم
   useEffect(() => {
     if (typeof window.TicketAPI === 'undefined' || !window.TicketAPI.getSubjects) return;
     setLoadingSubjects(true);
@@ -27,23 +87,39 @@ export default function StudentNewTicketPage() {
       .then((list) => {
         const arr = Array.isArray(list) ? list : [];
         setSubjects(arr);
-        if (arr.length > 0 && !subjectId) setSubjectId(arr[0].id ?? arr[0].Id ?? '');
+
+        // استرجع الـ subject المحفوظ لو موجود في القائمة دي
+        // لو أول مرة (مفيش محفوظ) → يفضل فاضي عشان الطالب يختار بنفسه
+        const savedSubjectId = saved.current?.subjectId;
+        if (savedSubjectId && arr.some((s) => (s.id ?? s.Id) === savedSubjectId)) {
+          setSubjectId(savedSubjectId);
+        } else {
+          setSubjectId('');
+        }
       })
-      .catch(() => setSubjects([]))
+      .catch(() => { setSubjects([]); setSubjectId(''); })
       .finally(() => setLoadingSubjects(false));
   }, [level, term]);
 
+  // تحميل الدكاترة عند تغيير المادة
   useEffect(() => {
     if (!subjectId || typeof window.TicketAPI === 'undefined' || !window.TicketAPI.getDoctorsBySubject) return;
-    setDoctorId('');
     setLoadingDoctors(true);
     window.TicketAPI.getDoctorsBySubject(subjectId)
       .then((list) => {
         const arr = Array.isArray(list) ? list : [];
         setDoctors(arr);
-        if (arr.length > 0) setDoctorId(arr[0].id ?? arr[0].Id ?? '');
+
+        // استرجع الدكتور المحفوظ لو موجود في القائمة دي
+        // لو أول مرة (مفيش محفوظ) → يفضل فاضي عشان الطالب يختار بنفسه
+        const savedDoctorId = saved.current?.doctorId;
+        if (savedDoctorId && arr.some((d) => (d.id ?? d.Id) === savedDoctorId)) {
+          setDoctorId(savedDoctorId);
+        } else {
+          setDoctorId('');
+        }
       })
-      .catch(() => setDoctors([]))
+      .catch(() => { setDoctors([]); setDoctorId(''); })
       .finally(() => setLoadingDoctors(false));
   }, [subjectId]);
 
@@ -64,6 +140,8 @@ export default function StudentNewTicketPage() {
       subjectId: subjectId.trim(),
     })
       .then(() => {
+        // احفظ اختيارات الطالب بعد الإرسال الناجح
+        saveChoices({ level, term, groupNumber, subjectId, doctorId });
         showToast('Ticket submitted successfully. We will get back to you soon.');
         setTimeout(() => router.push('/student'), 1500);
       })
@@ -83,7 +161,7 @@ export default function StudentNewTicketPage() {
           <div className="form-grid">
             <div className="form-group">
               <label className="form-label">Choose Level <span className="required">*</span></label>
-              <select className="form-select" value={level} onChange={(e) => setLevel(e.target.value)} required>
+              <select className="form-select" value={level} onChange={(e) => { setLevel(e.target.value); saveLevel(e.target.value); }} required>
                 <option value="1">Level 1</option>
                 <option value="2">Level 2</option>
                 <option value="3">Level 3</option>
@@ -118,6 +196,7 @@ export default function StudentNewTicketPage() {
             <div className="form-group">
               <label className="form-label">Group Number <span className="required">*</span></label>
               <select className="form-select" value={groupNumber} onChange={(e) => setGroupNumber(e.target.value)} required>
+                <option value="">Select Group</option>
                 {Array.from({ length: 35 }, (_, i) => i + 1).map((n) => (
                   <option key={n} value={n}>Group {n}</option>
                 ))}

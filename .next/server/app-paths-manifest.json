@@ -1,7 +1,6 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/api/proxy/[...path]/route": "app/api/proxy/[...path]/route.js",
   "/page": "app/page.js",
-  "/administrator/page": "app/administrator/page.js",
-  "/administrator/student-tickets/page": "app/administrator/student-tickets/page.js"
+  "/api/proxy/[...path]/route": "app/api/proxy/[...path]/route.js",
+  "/student/new-ticket/page": "app/student/new-ticket/page.js",
+  "/student/page": "app/student/page.js"
 }

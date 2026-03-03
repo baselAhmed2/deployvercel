@@ -11,26 +11,20 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/administrator/page": [
+    "/student/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/administrator/page.css",
-      "static/chunks/app/administrator/page.js"
+      "static/chunks/app/student/page.js"
     ],
-    "/administrator/layout": [
+    "/student/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/administrator/layout.js"
+      "static/chunks/app/student/layout.js"
     ],
-    "/administrator/student-tickets/page": [
+    "/student/new-ticket/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/administrator/student-tickets/page.js"
-    ],
-    "/_not-found/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/_not-found/page.js"
+      "static/chunks/app/student/new-ticket/page.js"
     ]
   }
 }
