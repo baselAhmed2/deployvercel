@@ -22,21 +22,6 @@
       "static/chunks/main-app.js",
       "static/chunks/app/administrator/layout.js"
     ],
-    "/administrator/site-settings/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/administrator/site-settings/page.js"
-    ],
-    "/administrator/analysis/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/administrator/analysis/page.js"
-    ],
-    "/administrator/add-course/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/administrator/add-course/page.js"
-    ],
     "/administrator/tickets/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -51,6 +36,31 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/administrator/users/page.js"
+    ],
+    "/administrator/student-tickets/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/administrator/student-tickets/page.js"
+    ],
+    "/administrator/add-subject/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/administrator/add-subject/page.js"
+    ],
+    "/administrator/add-course/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/administrator/add-course/page.js"
+    ],
+    "/administrator/analysis/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/administrator/analysis/page.js"
+    ],
+    "/administrator/site-settings/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/administrator/site-settings/page.js"
     ]
   }
 }

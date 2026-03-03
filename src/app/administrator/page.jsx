@@ -160,6 +160,8 @@ export default function AdminDashboard() {
 
   const [messages, setMessages] = useState(null);
   const [loadingMessages, setLoadingMessages] = useState(false);
+  const [messagesPage, setMessagesPage] = useState(1);
+  const [messagesTotalPages, setMessagesTotalPages] = useState(1);
 
   const [myDoctorTickets, setMyDoctorTickets] = useState(null);
   const [loadingMyTickets, setLoadingMyTickets] = useState(false);
@@ -220,15 +222,19 @@ export default function AdminDashboard() {
       .finally(() => setLoadingMyTickets(false));
   }
 
-  function loadMessages() {
-    if (typeof window.TicketAPI === 'undefined' || messages !== null) return;
+  function loadMessages(page = 1) {
+    if (typeof window.TicketAPI === 'undefined') return;
+    if (page === 1 && messages !== null) return;
     const api = window.TicketAPI;
     setLoadingMessages(true);
-    const call = api.getAdminMessages ? api.getAdminMessages(1, 10) : Promise.resolve([]);
+    const call = api.getAdminMessages ? api.getAdminMessages(page, 10) : Promise.resolve([]);
     call
       .then((res) => {
-        const data = res?.data ?? res?.Data ?? [];
+        const data = res?.data ?? res?.Data ?? (Array.isArray(res) ? res : []);
         setMessages(Array.isArray(data) ? data : []);
+        const pages = res?.totalPages ?? res?.TotalPages ?? 1;
+        setMessagesTotalPages(pages);
+        setMessagesPage(page);
       })
       .catch(() => setMessages([]))
       .finally(() => setLoadingMessages(false));
@@ -430,7 +436,7 @@ export default function AdminDashboard() {
         ) : !messages || messages.length === 0 ? (
           <p style={{ color: '#666', fontSize: '0.9rem' }}>No messages yet. Messages from tickets you've replied to will appear here.</p>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 0, margin: '0 -20px' }}>
+          <div className="ticket-list">
             {messages.map((m) => {
               const msgId = m.messageId ?? m.MessageId ?? m.id ?? m.Id;
               const body = m.body ?? m.Body ?? '';
@@ -440,27 +446,36 @@ export default function AdminDashboard() {
               const ticketId = m.ticketId ?? m.TicketId ?? '';
               const ticketTitle = m.ticketTitle ?? m.TicketTitle ?? '';
               const studentName = m.studentName ?? m.StudentName ?? '';
+              const doctorName = m.doctorName ?? m.DoctorName ?? '';
+
               const adminId = typeof localStorage !== 'undefined' ? localStorage.getItem('userId') : '';
               const isOwnMessage = senderId === adminId;
+
               return (
-                <div key={msgId} style={{
-                  padding: '12px 20px',
-                  borderBottom: `1px solid ${dark ? '#2d3148' : '#f0f0f0'}`,
-                  background: isOwnMessage ? (dark ? '#252a3d' : '#f8f9fa') : (dark ? '#1a1d27' : '#fff'),
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(senderName)}&size=24&background=${isOwnMessage ? '6f42c1' : '20c997'}&color=fff`} alt="" style={{ borderRadius: '50%', width: 24, height: 24 }} />
-                      <strong style={{ fontSize: '0.9rem', color: dark ? '#e2e8f0' : '#212529' }}>{senderName}</strong>
-                      {isOwnMessage && <span style={{ fontSize: '0.75rem', background: '#6f42c1', color: '#fff', padding: '1px 6px', borderRadius: 4 }}>You</span>}
-                    </div>
-                    <span style={{ fontSize: '0.8rem', color: textMuted }}>{timeAgo(sentAt)}</span>
+                <article key={msgId} className="ticket-card">
+                  <div className="ticket-card-header">
+                    <span className="ticket-id">Ticket# {ticketId}</span>
+                    <span className="ticket-time">Sent at {formatDate(sentAt)}</span>
                   </div>
-                  <p style={{ margin: '4px 0', fontSize: '0.9rem', color: textBody }}>{body.length > 120 ? body.slice(0, 120) + '...' : body}</p>
-                  <Link href={`/administrator/ticket/${ticketId}`} style={{ fontSize: '0.8rem', color: '#0d6efd' }}>
-                    <i className="fas fa-ticket-alt"></i> {ticketTitle || ticketId} — {studentName}
-                  </Link>
-                </div>
+                  <h2 className="ticket-subject">{ticketTitle || `Ticket# ${ticketId}`}</h2>
+
+                  <div style={{ margin: '12px 0', borderLeft: '4px solid #007bff', paddingLeft: '12px', background: dark ? '#222635' : '#f8f9fa', padding: '10px 12px', borderRadius: '4px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                      <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(senderName)}&size=20&background=${isOwnMessage ? '6f42c1' : '20c997'}&color=fff`} alt="" style={{ borderRadius: '50%', width: 20, height: 20 }} />
+                      <span style={{ fontWeight: 'bold', fontSize: '0.9rem', color: dark ? '#e2e8f0' : '#495057' }}>
+                        {isOwnMessage ? 'Your Reply:' : `${senderName} (Admin Reply):`}
+                      </span>
+                    </div>
+                    <p className="ticket-preview" style={{ margin: 0, color: textBody, fontSize: '0.95rem' }}>{body}</p>
+                  </div>
+
+                  <div className="ticket-card-footer">
+                    <div className="ticket-responder">
+                      From {studentName} to {doctorName || 'Doctor'}
+                    </div>
+                    <Link href={`/administrator/ticket/${ticketId}`} className="btn-link">View Ticket</Link>
+                  </div>
+                </article>
               );
             })}
           </div>

@@ -221,7 +221,7 @@ export const TicketAPI = {
     return request(`/api/Analytics/top-subjects?${params}`);
   },
   getAdminMessages(pageIndex = 1, pageSize = 20) {
-    return request(`/api/Admin/messages?pageIndex=${pageIndex}&pageSize=${pageSize}`);
+    return request(`/api/Admin/my-messages?pageIndex=${pageIndex}&pageSize=${pageSize}`);
   },
   adminAssignSelfToSubject(subjectId) {
     return request(`/api/Admin/subjects/${encodeURIComponent(subjectId)}/assign-self`, { method: 'POST' });
