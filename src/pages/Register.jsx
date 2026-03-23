@@ -9,13 +9,20 @@ export default function Register() {
     name: '',
     email: '',
     ssn: '',
-    program: ''
+    program: 'BIS'
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    // Prevent non-numeric characters for SSN and Student ID
+    if (e.target.name === 'ssn' || e.target.name === 'studentId') {
+      const numericValue = e.target.value.replace(/\D/g, '');
+      setFormData({ ...formData, [e.target.name]: numericValue });
+    } else {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
+    }
   };
 
   const handleSubmit = (e) => {
@@ -30,19 +37,21 @@ export default function Register() {
       return;
     }
 
+    if (ssn.length !== 14) {
+      setError('National ID (SSN) must be exactly 14 digits.');
+      return;
+    }
+
     const emailRegex = /^[^\s@]+@(commerce\.helwan\.edu\.eg|fcba\.capu\.edu\.eg)$/i;
     if (!emailRegex.test(email)) {
       setError('You must use your college email (@commerce.helwan.edu.eg or @fcba.capu.edu.eg)');
       return;
     }
 
-    const payload = {
-      ...formData,
-      password: ssn
-    };
+    setIsSubmitting(true);
 
     if (typeof window.TicketAPI !== 'undefined' && window.TicketAPI.registerStudent) {
-      window.TicketAPI.registerStudent(payload)
+      window.TicketAPI.registerStudent(formData)
         .then(() => {
           setSuccess('Registration successful! Redirecting to verify OTP...');
           setTimeout(() => {
@@ -50,16 +59,18 @@ export default function Register() {
           }, 1500);
         })
         .catch((err) => {
+          setIsSubmitting(false);
           const msg = err && err.message ? err.message.toLowerCase() : '';
           const rawMsg = err && err.message ? err.message : 'Registration failed. Please try again.';
           
-          if (msg.includes('already exists') || msg.includes('exist') || msg.includes('registered') || msg.includes('already')) {
+          if (msg.includes('already exists') || msg.includes('exist') || msg.includes('registered') || msg.includes('already') || msg.includes('id')) {
             setError('Account already exists! Please securely log in using your Student ID and National ID (SSN) as your password.');
           } else {
             setError(rawMsg);
           }
         });
     } else {
+      setIsSubmitting(false);
       setError('API not initialized. Ensure TicketAPI is loaded.');
     }
   };
@@ -89,6 +100,7 @@ export default function Register() {
                 value={formData.studentId}
                 onChange={handleChange}
                 required
+                disabled={isSubmitting}
               />
             </div>
             <div className="input-group">
@@ -100,6 +112,7 @@ export default function Register() {
                 value={formData.name}
                 onChange={handleChange}
                 required
+                disabled={isSubmitting}
               />
             </div>
             <div className="input-group">
@@ -111,35 +124,62 @@ export default function Register() {
                 value={formData.email}
                 onChange={handleChange}
                 required
+                disabled={isSubmitting}
               />
             </div>
-            <div className="input-group">
-              <i className="fas fa-address-card input-icon"></i>
-              <input
-                type="text"
-                name="ssn"
-                placeholder="SSN (National ID)"
-                value={formData.ssn}
-                onChange={handleChange}
-                required
-              />
+            <div className="input-group" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
+              <div style={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center' }}>
+                <i className="fas fa-address-card input-icon"></i>
+                <input
+                  type="text"
+                  name="ssn"
+                  placeholder="SSN (National ID) - 14 Digits"
+                  value={formData.ssn}
+                  onChange={handleChange}
+                  maxLength="14"
+                  required
+                  disabled={isSubmitting}
+                />
+              </div>
+              <span style={{ fontSize: '0.75rem', color: 'rgba(203, 213, 225, 0.7)', paddingLeft: '4px' }}>
+                💡 Your SSN will securely be set as your login password.
+              </span>
             </div>
+            
             <div className="input-group">
               <i className="fas fa-graduation-cap input-icon"></i>
-              <input
-                type="text"
+              <select
                 name="program"
-                placeholder="Program"
                 value={formData.program}
                 onChange={handleChange}
                 required
-              />
+                disabled={isSubmitting}
+                style={{
+                  width: '100%',
+                  padding: '14px 16px 14px 44px',
+                  borderRadius: '10px',
+                  border: '1px solid rgba(165, 180, 252, 0.2)',
+                  background: 'rgba(15, 23, 42, 0.5)',
+                  color: '#fff',
+                  fontSize: '1rem',
+                  outline: 'none',
+                  appearance: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="BIS">BIS</option>
+                <option value="FMI">FMI</option>
+                <option value="SBS">SBS</option>
+              </select>
+              <i className="fas fa-chevron-down" style={{ position: 'absolute', right: '16px', color: 'rgba(165, 180, 252, 0.7)', pointerEvents: 'none' }}></i>
             </div>
+            
             {error && <p role="alert" style={{ color: '#dc3545', fontSize: '0.85rem', marginTop: 4 }}>{error}</p>}
             {success && <p role="alert" style={{ color: '#28a745', fontSize: '0.85rem', marginTop: 4 }}>{success}</p>}
-            <button type="submit" className="sign-in-btn" style={{ marginTop: '10px' }}>
-              Register
-              <i className="fas fa-user-plus"></i>
+            <button type="submit" className="sign-in-btn" style={{ marginTop: '10px', opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer' }} disabled={isSubmitting}>
+              {isSubmitting ? 'Registering...' : 'Register'}
+              {!isSubmitting && <i className="fas fa-user-plus"></i>}
+              {isSubmitting && <i className="fas fa-spinner fa-spin"></i>}
             </button>
             <div className="form-options" style={{ justifyContent: 'center', marginTop: '10px' }}>
               <Link to="/" className="forgot-link">Already have an account? Login</Link>
