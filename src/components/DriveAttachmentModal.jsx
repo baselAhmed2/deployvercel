@@ -24,7 +24,7 @@ export default function DriveAttachmentModal({ isOpen, onClose, onAttach }) {
         
         <div style={{ background: '#f8f9fa', padding: '16px', borderRadius: '8px', marginBottom: '16px', borderLeft: '4px solid #6f42c1', borderRight: 'none' }}>
           <p style={{ margin: 0, fontSize: '0.95rem', lineHeight: '1.6', color: '#495057' }}>
-            🎉 <strong>مرحباً بك!</strong> لضمان حرية رفع البيانات لك بدون قيود في المساحة، نطلب منك رفع ملفاتك على <strong style={{color: '#0d6efd'}}>Google Drive</strong> أو أي منصة مشابهة والتأكد من أن الفولدر <strong>Public</strong> (متاح للجميع)، ثم ضع الرابط هنا.
+            🎉 <strong>مرحباً بك!</strong> لضمان حرية رفع البيانات لك بدون قيود في المساحة، نطلب منك رفع ملفاتك على <a href="https://drive.google.com" target="_blank" rel="noopener noreferrer" style={{color: '#0d6efd', fontWeight: 'bold', textDecoration: 'underline'}}>Google Drive</a> أو أي منصة مشابهة والتأكد من أن الفولدر <strong>Public</strong> (متاح للجميع)، ثم ضع الرابط هنا.
           </p>
         </div>
 
