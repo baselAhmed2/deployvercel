@@ -9,7 +9,6 @@ export default function Register() {
     name: '',
     email: '',
     ssn: '',
-    password: '',
     program: ''
   });
   const [error, setError] = useState('');
@@ -25,8 +24,8 @@ export default function Register() {
     setSuccess('');
 
     // Client-side validation
-    const { studentId, name, email, ssn, password } = formData;
-    if (!studentId || !name || !email || !ssn || !password) {
+    const { studentId, name, email, ssn, program } = formData;
+    if (!studentId || !name || !email || !ssn || !program) {
       setError('Please fill in all required fields.');
       return;
     }
@@ -37,8 +36,13 @@ export default function Register() {
       return;
     }
 
+    const payload = {
+      ...formData,
+      password: ssn
+    };
+
     if (typeof window.TicketAPI !== 'undefined' && window.TicketAPI.registerStudent) {
-      window.TicketAPI.registerStudent(formData)
+      window.TicketAPI.registerStudent(payload)
         .then(() => {
           setSuccess('Registration successful! Redirecting to verify OTP...');
           setTimeout(() => {
@@ -46,8 +50,14 @@ export default function Register() {
           }, 1500);
         })
         .catch((err) => {
-          const msg = err && err.message ? err.message : 'Registration failed. Please try again.';
-          setError(msg);
+          const msg = err && err.message ? err.message.toLowerCase() : '';
+          const rawMsg = err && err.message ? err.message : 'Registration failed. Please try again.';
+          
+          if (msg.includes('already exists') || msg.includes('exist') || msg.includes('registered') || msg.includes('already')) {
+            setError('Account already exists! Please securely log in using your Student ID and National ID (SSN) as your password.');
+          } else {
+            setError(rawMsg);
+          }
         });
     } else {
       setError('API not initialized. Ensure TicketAPI is loaded.');
@@ -115,24 +125,14 @@ export default function Register() {
               />
             </div>
             <div className="input-group">
-              <i className="fas fa-lock input-icon"></i>
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="input-group">
               <i className="fas fa-graduation-cap input-icon"></i>
               <input
                 type="text"
                 name="program"
-                placeholder="Program (Optional)"
+                placeholder="Program"
                 value={formData.program}
                 onChange={handleChange}
+                required
               />
             </div>
             {error && <p role="alert" style={{ color: '#dc3545', fontSize: '0.85rem', marginTop: 4 }}>{error}</p>}
