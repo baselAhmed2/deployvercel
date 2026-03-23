@@ -14,6 +14,16 @@ export default function Register() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // UI UX States
+  const [showSsn, setShowSsn] = useState(false);
+  const [focusedField, setFocusedField] = useState(null);
+  const [shake, setShake] = useState(false);
+
+  const triggerShake = () => {
+    setShake(true);
+    setTimeout(() => setShake(false), 400);
+  };
 
   const handleChange = (e) => {
     // Prevent non-numeric characters for SSN and Student ID
@@ -25,6 +35,19 @@ export default function Register() {
     }
   };
 
+  const handleFocus = (field) => setFocusedField(field);
+  const handleBlur = () => setFocusedField(null);
+
+  const getIconStyle = (fieldName) => ({
+    color: focusedField === fieldName ? '#818cf8' : undefined,
+    transition: 'color 0.3s ease'
+  });
+
+  const appendEmailDomain = (domain) => {
+    const currentEmail = formData.email.split('@')[0];
+    setFormData({ ...formData, email: `${currentEmail}@${domain}` });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
@@ -34,17 +57,20 @@ export default function Register() {
     const { studentId, name, email, ssn, program } = formData;
     if (!studentId || !name || !email || !ssn || !program) {
       setError('Please fill in all required fields.');
+      triggerShake();
       return;
     }
 
     if (ssn.length !== 14) {
       setError('National ID (SSN) must be exactly 14 digits.');
+      triggerShake();
       return;
     }
 
     const emailRegex = /^[^\s@]+@(commerce\.helwan\.edu\.eg|fcba\.capu\.edu\.eg)$/i;
     if (!emailRegex.test(email)) {
       setError('You must use your college email (@commerce.helwan.edu.eg or @fcba.capu.edu.eg)');
+      triggerShake();
       return;
     }
 
@@ -68,6 +94,7 @@ export default function Register() {
         })
         .catch((err) => {
           setIsSubmitting(false);
+          triggerShake();
           const msg = err && err.message ? err.message.toLowerCase() : '';
           const rawMsg = err && err.message ? err.message : 'Registration failed. Please try again.';
           
@@ -79,92 +106,140 @@ export default function Register() {
         });
     } else {
       setIsSubmitting(false);
+      triggerShake();
       setError('API not initialized. Ensure TicketAPI is loaded.');
     }
   };
 
   return (
     <>
+      <style>{`
+        @keyframes formShake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-5px); }
+          50% { transform: translateX(5px); }
+          75% { transform: translateX(-5px); }
+        }
+        .shake-animation {
+          animation: formShake 0.4s ease-in-out;
+        }
+        @keyframes pop {
+          0% { transform: scale(0.5); opacity: 0; }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        .domain-btn:hover {
+          background: rgba(99, 102, 241, 0.4) !important;
+        }
+      `}</style>
       <div className="background">
         <div className="background-image"></div>
         <div className="background-overlay"></div>
       </div>
-      <main className="login-wrapper" style={{ maxWidth: '500px', margin: 'auto' }}>
-        <div className="login-card" style={{ padding: '32px 40px' }}>
-          <div className="card-header" style={{ marginBottom: '24px' }}>
+      <main className="login-wrapper">
+        <div className="login-card">
+          <div className="card-header">
             <div className="logo">
               <img src="/login/imgs/image (5).png" alt="Capital University" className="logo-img" onError={(e) => { e.target.style.display = 'none'; }} />
             </div>
-            <h1 className="university-name" style={{ fontSize: '1.6rem' }}>Capital University</h1>
+            <h1 className="university-name">Capital University</h1>
             <p className="portal-title">Create Student Account</p>
           </div>
-          <form className="login-form" onSubmit={handleSubmit} style={{ gap: '16px' }}>
+          <form className={`login-form ${shake ? 'shake-animation' : ''}`} onSubmit={handleSubmit}>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              <div className="input-group">
-                <i className="fas fa-id-card input-icon"></i>
-                <input
-                  type="text"
-                  name="studentId"
-                  placeholder="Student ID"
-                  value={formData.studentId}
-                  onChange={handleChange}
-                  required
-                  disabled={isSubmitting}
-                />
-              </div>
-              <div className="input-group">
-                <i className="fas fa-user input-icon"></i>
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Full Name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  disabled={isSubmitting}
-                />
-              </div>
+            <div className="input-group">
+              <i className="fas fa-id-card input-icon" style={getIconStyle('studentId')}></i>
+              <input
+                type="text"
+                name="studentId"
+                placeholder="Student ID"
+                value={formData.studentId}
+                onChange={handleChange}
+                onFocus={() => handleFocus('studentId')}
+                onBlur={handleBlur}
+                required
+                disabled={isSubmitting}
+              />
+            </div>
+            
+            <div className="input-group">
+              <i className="fas fa-user input-icon" style={getIconStyle('name')}></i>
+              <input
+                type="text"
+                name="name"
+                placeholder="Full Name"
+                value={formData.name}
+                onChange={handleChange}
+                onFocus={() => handleFocus('name')}
+                onBlur={handleBlur}
+                required
+                disabled={isSubmitting}
+              />
             </div>
 
-            <div className="input-group">
-              <i className="fas fa-envelope input-icon"></i>
+            <div className="input-group" style={{ marginBottom: !formData.email.includes('@') && formData.email.length > 0 ? '4px' : '16px' }}>
+              <i className="fas fa-envelope input-icon" style={getIconStyle('email')}></i>
               <input
                 type="email"
                 name="email"
                 placeholder="College Email"
                 value={formData.email}
                 onChange={handleChange}
+                onFocus={() => handleFocus('email')}
+                onBlur={handleBlur}
                 required
                 disabled={isSubmitting}
               />
             </div>
+            {!formData.email.includes('@') && formData.email.length > 0 && (
+              <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', marginTop: '-12px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.85rem', color: '#cbd5e1', width: '100%', fontWeight: '500' }}>Quick append domain:</span>
+                <button type="button" className="domain-btn" onClick={() => appendEmailDomain('commerce.helwan.edu.eg')} style={{ padding: '6px 10px', fontSize: '0.75rem', borderRadius: '6px', background: 'rgba(99, 102, 241, 0.15)', color: '#c7d2fe', border: '1px solid rgba(99, 102, 241, 0.3)', cursor: 'pointer', transition: 'all 0.2s' }}>@commerce.helwan</button>
+                <button type="button" className="domain-btn" onClick={() => appendEmailDomain('fcba.capu.edu.eg')} style={{ padding: '6px 10px', fontSize: '0.75rem', borderRadius: '6px', background: 'rgba(99, 102, 241, 0.15)', color: '#c7d2fe', border: '1px solid rgba(99, 102, 241, 0.3)', cursor: 'pointer', transition: 'all 0.2s' }}>@fcba.capu</button>
+              </div>
+            )}
             
-            <div className="input-group" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '6px' }}>
-              <div style={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center' }}>
-                <i className="fas fa-address-card input-icon"></i>
-                <input
-                  type="text"
-                  name="ssn"
-                  placeholder="SSN (National ID) - 14 Digits"
-                  value={formData.ssn}
-                  onChange={handleChange}
-                  maxLength="14"
-                  required
-                  disabled={isSubmitting}
+            <div className="input-group" style={{ marginBottom: '4px', position: 'relative' }}>
+              <i className="fas fa-address-card input-icon" style={{ zIndex: 1, ...getIconStyle('ssn') }}></i>
+              <input
+                type={showSsn ? "text" : "password"}
+                name="ssn"
+                placeholder="SSN (National ID) - 14 Digits"
+                value={formData.ssn}
+                onChange={handleChange}
+                onFocus={() => handleFocus('ssn')}
+                onBlur={handleBlur}
+                maxLength="14"
+                required
+                disabled={isSubmitting}
+                style={{ paddingRight: '60px' }}
+              />
+              <div style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', gap: '8px', zIndex: 2 }}>
+                {formData.ssn.length === 14 && <span style={{ color: '#10b981', fontSize: '1rem', animation: 'pop 0.3s ease' }}>✅</span>}
+                <i
+                  className={`fas ${showSsn ? 'fa-eye-slash' : 'fa-eye'}`}
+                  onClick={() => setShowSsn(!showSsn)}
+                  style={{ cursor: 'pointer', color: '#a5b4fc', transition: 'color 0.2s' }}
+                  title={showSsn ? 'Hide SSN' : 'Show SSN'}
                 />
               </div>
-              <span style={{ fontSize: '0.8rem', color: 'rgba(203, 213, 225, 0.8)', paddingLeft: '4px' }}>
-                💡 Your SSN will securely be set as your login password.
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', paddingLeft: '4px', paddingRight: '4px' }}>
+              <p style={{ fontSize: '0.85rem', color: '#e2e8f0', margin: 0, fontWeight: '500' }}>
+                💡 Your SSN is your password.
+              </p>
+              <span style={{ fontSize: '0.85rem', color: formData.ssn.length === 14 ? '#10b981' : '#cbd5e1', transition: 'color 0.3s', fontWeight: '500' }}>
+                {formData.ssn.length}/14
               </span>
             </div>
             
-            <div className="input-group">
-              <i className="fas fa-graduation-cap input-icon"></i>
+            <div className="input-group" style={{ position: 'relative' }}>
+              <i className="fas fa-graduation-cap input-icon" style={{ zIndex: 1, pointerEvents: 'none', ...getIconStyle('program') }}></i>
               <select
                 name="program"
                 value={formData.program}
                 onChange={handleChange}
+                onFocus={() => handleFocus('program')}
+                onBlur={handleBlur}
                 required
                 disabled={isSubmitting}
                 style={{
@@ -180,22 +255,27 @@ export default function Register() {
                   cursor: 'pointer'
                 }}
               >
-                <option value="BIS">BIS</option>
-                <option value="FMI">FMI</option>
-                <option value="SBS">SBS</option>
+                <option value="BIS" style={{ background: '#0f172a' }}>BIS</option>
+                <option value="FMI" style={{ background: '#0f172a' }}>FMI</option>
+                <option value="SBS" style={{ background: '#0f172a' }}>SBS</option>
               </select>
-              <i className="fas fa-chevron-down" style={{ position: 'absolute', right: '16px', color: 'rgba(165, 180, 252, 0.7)', pointerEvents: 'none' }}></i>
+              <i className="fas fa-chevron-down" style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', color: '#a5b4fc', pointerEvents: 'none', zIndex: 1 }}></i>
             </div>
             
-            {error && <p role="alert" style={{ color: '#dc3545', fontSize: '0.9rem', marginTop: 0, textAlign: 'center' }}>{error}</p>}
-            {success && <p role="alert" style={{ color: '#28a745', fontSize: '0.9rem', marginTop: 0, textAlign: 'center' }}>{success}</p>}
+            {error && <p role="alert" style={{ color: '#dc3545', fontSize: '0.9rem', marginTop: '8px', textAlign: 'center', animation: 'pop 0.3s ease' }}>{error}</p>}
+            {success && <p role="alert" style={{ color: '#28a745', fontSize: '0.9rem', marginTop: '8px', textAlign: 'center', animation: 'pop 0.3s ease' }}>{success}</p>}
             
-            <button type="submit" className="sign-in-btn" style={{ marginTop: '8px', opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer' }} disabled={isSubmitting}>
-              {isSubmitting ? 'Registering...' : 'Register'}
-              {!isSubmitting && <i className="fas fa-user-plus"></i>}
-              {isSubmitting && <i className="fas fa-spinner fa-spin" style={{ marginLeft: '8px' }}></i>}
+            <button type="submit" className="sign-in-btn" style={{ marginTop: '16px', opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer', position: 'relative', overflow: 'hidden' }} disabled={isSubmitting}>
+              <span style={{ transition: 'opacity 0.2s', opacity: isSubmitting ? 0 : 1 }}>
+                Register <i className="fas fa-user-plus" style={{ marginLeft: '4px' }}></i>
+              </span>
+              {isSubmitting && (
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <i className="fas fa-spinner fa-spin"></i> Registering...
+                </div>
+              )}
             </button>
-            <div className="form-options" style={{ justifyContent: 'center', marginTop: '4px' }}>
+            <div className="form-options" style={{ justifyContent: 'center', marginTop: '16px' }}>
               <Link to="/" className="forgot-link">Already have an account? Login</Link>
             </div>
           </form>
