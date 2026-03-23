@@ -51,7 +51,15 @@ export default function Register() {
     setIsSubmitting(true);
 
     if (typeof window.TicketAPI !== 'undefined' && window.TicketAPI.registerStudent) {
-      window.TicketAPI.registerStudent(formData)
+      const payload = {
+        StudentId: formData.studentId,
+        Name: formData.name,
+        Email: formData.email,
+        SSN: formData.ssn,
+        Program: formData.program
+      };
+
+      window.TicketAPI.registerStudent(payload)
         .then(() => {
           setSuccess('Registration successful! Redirecting to verify OTP...');
           setTimeout(() => {
@@ -81,40 +89,44 @@ export default function Register() {
         <div className="background-image"></div>
         <div className="background-overlay"></div>
       </div>
-      <main className="login-wrapper">
-        <div className="login-card" style={{ padding: '30px 36px' }}>
-          <div className="card-header" style={{ marginBottom: '20px' }}>
+      <main className="login-wrapper" style={{ maxWidth: '500px', margin: 'auto' }}>
+        <div className="login-card" style={{ padding: '32px 40px' }}>
+          <div className="card-header" style={{ marginBottom: '24px' }}>
             <div className="logo">
               <img src="/login/imgs/image (5).png" alt="Capital University" className="logo-img" onError={(e) => { e.target.style.display = 'none'; }} />
             </div>
-            <h1 className="university-name" style={{ fontSize: '1.5rem' }}>Capital University</h1>
+            <h1 className="university-name" style={{ fontSize: '1.6rem' }}>Capital University</h1>
             <p className="portal-title">Create Student Account</p>
           </div>
-          <form className="login-form" onSubmit={handleSubmit} style={{ gap: '12px' }}>
-            <div className="input-group">
-              <i className="fas fa-id-card input-icon"></i>
-              <input
-                type="text"
-                name="studentId"
-                placeholder="Student ID"
-                value={formData.studentId}
-                onChange={handleChange}
-                required
-                disabled={isSubmitting}
-              />
+          <form className="login-form" onSubmit={handleSubmit} style={{ gap: '16px' }}>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div className="input-group">
+                <i className="fas fa-id-card input-icon"></i>
+                <input
+                  type="text"
+                  name="studentId"
+                  placeholder="Student ID"
+                  value={formData.studentId}
+                  onChange={handleChange}
+                  required
+                  disabled={isSubmitting}
+                />
+              </div>
+              <div className="input-group">
+                <i className="fas fa-user input-icon"></i>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Full Name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  disabled={isSubmitting}
+                />
+              </div>
             </div>
-            <div className="input-group">
-              <i className="fas fa-user input-icon"></i>
-              <input
-                type="text"
-                name="name"
-                placeholder="Full Name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                disabled={isSubmitting}
-              />
-            </div>
+
             <div className="input-group">
               <i className="fas fa-envelope input-icon"></i>
               <input
@@ -127,7 +139,8 @@ export default function Register() {
                 disabled={isSubmitting}
               />
             </div>
-            <div className="input-group" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
+            
+            <div className="input-group" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '6px' }}>
               <div style={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center' }}>
                 <i className="fas fa-address-card input-icon"></i>
                 <input
@@ -141,7 +154,7 @@ export default function Register() {
                   disabled={isSubmitting}
                 />
               </div>
-              <span style={{ fontSize: '0.75rem', color: 'rgba(203, 213, 225, 0.7)', paddingLeft: '4px' }}>
+              <span style={{ fontSize: '0.8rem', color: 'rgba(203, 213, 225, 0.8)', paddingLeft: '4px' }}>
                 💡 Your SSN will securely be set as your login password.
               </span>
             </div>
@@ -174,14 +187,15 @@ export default function Register() {
               <i className="fas fa-chevron-down" style={{ position: 'absolute', right: '16px', color: 'rgba(165, 180, 252, 0.7)', pointerEvents: 'none' }}></i>
             </div>
             
-            {error && <p role="alert" style={{ color: '#dc3545', fontSize: '0.85rem', marginTop: 4 }}>{error}</p>}
-            {success && <p role="alert" style={{ color: '#28a745', fontSize: '0.85rem', marginTop: 4 }}>{success}</p>}
-            <button type="submit" className="sign-in-btn" style={{ marginTop: '10px', opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer' }} disabled={isSubmitting}>
+            {error && <p role="alert" style={{ color: '#dc3545', fontSize: '0.9rem', marginTop: 0, textAlign: 'center' }}>{error}</p>}
+            {success && <p role="alert" style={{ color: '#28a745', fontSize: '0.9rem', marginTop: 0, textAlign: 'center' }}>{success}</p>}
+            
+            <button type="submit" className="sign-in-btn" style={{ marginTop: '8px', opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer' }} disabled={isSubmitting}>
               {isSubmitting ? 'Registering...' : 'Register'}
               {!isSubmitting && <i className="fas fa-user-plus"></i>}
-              {isSubmitting && <i className="fas fa-spinner fa-spin"></i>}
+              {isSubmitting && <i className="fas fa-spinner fa-spin" style={{ marginLeft: '8px' }}></i>}
             </button>
-            <div className="form-options" style={{ justifyContent: 'center', marginTop: '10px' }}>
+            <div className="form-options" style={{ justifyContent: 'center', marginTop: '4px' }}>
               <Link to="/" className="forgot-link">Already have an account? Login</Link>
             </div>
           </form>
