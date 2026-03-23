@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analysis - TICKET LEAD</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-left">
+      <button type="button" class="sidebar-toggle" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+      <span class="brand">TICKET LEAD</span>
+      <span class="welcome-text">Welcome!</span>
+    </div>
+    <div class="header-right">
+      <img src="https://ui-avatars.com/api/?name=DR+Bahlol&background=6f42c1&color=fff" alt="" class="user-avatar" />
+      <span class="user-name">DR Bahlol</span>
+      <button type="button" class="user-menu-btn" aria-label="User menu"><i class="fas fa-chevron-down"></i></button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+  <div class="app-body">
+    <aside class="sidebar" id="sidebar" aria-hidden="true">
+      <div class="sidebar-header">
+        <span class="brand">TICKET LEAD</span>
+        <button type="button" class="sidebar-close" aria-label="Close menu"><i class="fas fa-times"></i></button>
+      </div>
+      <nav>
+        <ul class="nav-list">
+          <li class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a></li>
+          <li class="nav-item"><a href="tickets.html" class="nav-link"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
+          <li class="nav-item"><a href="users.html" class="nav-link"><i class="fas fa-users"></i> Users</a></li>
+          <li class="nav-item"><a href="add-course.html" class="nav-link"><i class="fas fa-book"></i> Add Course</a></li>
+          <li class="nav-item"><a href="analysis.html" class="nav-link active"><i class="fas fa-chart-bar"></i> Analysis</a></li>
+          <li class="nav-item"><a href="../login/index.html" class="nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+      </nav>
+      <div class="sidebar-footer">
+        <ul class="nav-list">
+          <li class="nav-item"><a href="site-settings.html" class="nav-link"><i class="fas fa-cog"></i> Site Settings</a></li>
+        </ul>
+      </div>
+    </aside>
+    <div class="app-layout">
+      <main class="main-content">
+        <h1 class="page-title">Analysis</h1>
+        <div class="detail-card">
+          <h2 class="section-title">Ticket Statistics</h2>
+          <p class="section-desc">Overview of tickets by status (placeholder – connect to your API for real data).</p>
+          <div class="stat-cards">
+            <div class="stat-card teal">
+              <div class="stat-card-value">20</div>
+              <div class="stat-card-label">New</div>
+              <div class="stat-card-illus" aria-hidden="true"><i class="fas fa-envelope"></i></div>
+            </div>
+            <div class="stat-card yellow">
+              <div class="stat-card-value">750</div>
+              <div class="stat-card-label">In Progress</div>
+              <div class="stat-card-illus" aria-hidden="true"><i class="fas fa-spinner"></i></div>
+            </div>
+            <div class="stat-card pink">
+              <div class="stat-card-value">150</div>
+              <div class="stat-card-label">Closed</div>
+              <div class="stat-card-illus" aria-hidden="true"><i class="fas fa-check-circle"></i></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script src="../api.config.js"></script>
+  <script src="../api.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

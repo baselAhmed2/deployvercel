@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - TICKET LEAD</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-left">
+      <button type="button" class="sidebar-toggle" aria-label="Open menu">
+        <i class="fas fa-bars"></i>
+      </button>
+      <span class="brand">TICKET LEAD</span>
+      <span class="welcome-text">Welcome!</span>
+    </div>
+    <div class="header-right">
+      <img src="https://ui-avatars.com/api/?name=Alex+Robert&background=6f42c1&color=fff" alt="" class="user-avatar" />
+      <span class="user-name">Alex Robert</span>
+      <button type="button" class="user-menu-btn" aria-label="User menu">
+        <i class="fas fa-chevron-down"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
+  <div class="app-body">
+    <aside class="sidebar" id="sidebar" aria-hidden="true">
+      <div class="sidebar-header">
+        <span class="brand">TICKET LEAD</span>
+        <button type="button" class="sidebar-close" aria-label="Close menu">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <nav>
+        <ul class="nav-list">
+          <li class="nav-item">
+            <a href="index.html" class="nav-link active">
+              <i class="fas fa-th-large"></i>
+              Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="new-ticket.html" class="nav-link">
+              <i class="fas fa-ticket-alt"></i>
+              New Ticket
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="../login/index.html" class="nav-link">
+              <i class="fas fa-sign-out-alt"></i>
+              Logout
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <div class="app-layout">
+    <main class="main-content">
+      <h1 class="page-title">Tickets</h1>
+
+      <div class="toolbar">
+        <div class="search-wrap">
+          <i class="fas fa-search"></i>
+          <input type="search" class="search-input" placeholder="Search for ticket." />
+        </div>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-dot blue"></span> Not Replied</span>
+          <span class="legend-item"><span class="legend-dot orange"></span> On-Going Tickets</span>
+          <span class="legend-item"><span class="legend-dot green"></span> Resolved Tickets</span>
+        </div>
+        <select class="filter-select" aria-label="Time filter">
+          <option>This Week</option>
+          <option>This Month</option>
+          <option>All Time</option>
+        </select>
+        <a href="new-ticket.html" class="btn-primary">
+          <i class="fas fa-plus"></i>
+          New Ticket
+        </a>
+      </div>
+
+      <div class="tabs">
+        <a href="#" class="tab active"><i class="fas fa-envelope"></i> All Tickets</a>
+        <a href="#" class="tab"><i class="fas fa-envelope"></i> Not Replied</a>
+        <a href="#" class="tab"><i class="fas fa-envelope"></i> On-Going</a>
+        <a href="#" class="tab"><i class="fas fa-envelope"></i> Resolved</a>
+      </div>
+
+      <div class="ticket-list">
+        <article class="ticket-card" data-status="not-replied">
+          <div class="ticket-card-header">
+            <span class="ticket-status-dot blue" title="Not Replied"></span>
+            <span class="ticket-id">Replay-Ticket# 2023-CS123</span>
+            <span class="ticket-status-label blue">Not Replied</span>
+            <span class="ticket-time">Posted at 12:45 AM</span>
+          </div>
+          <h2 class="ticket-subject">How to Join to my portal?</h2>
+          <p class="ticket-preview">I need steps to access the student portal and reset my password.</p>
+          <div class="ticket-card-footer">
+            <div class="ticket-responder">
+              <img src="https://ui-avatars.com/api/?name=Mohamed+Ahmed&size=28" alt="" class="ticket-responder-avatar" />
+              Dr. Mohamed Ahmed
+            </div>
+            <a href="ticket-detail.html" class="btn-link">Open Ticket</a>
+          </div>
+        </article>
+
+        <article class="ticket-card" data-status="on-going">
+          <div class="ticket-card-header">
+            <span class="ticket-status-dot orange" title="On-Going"></span>
+            <span class="ticket-id">Ticket# 2023-CS456</span>
+            <span class="ticket-status-label orange">On-Going</span>
+            <span class="ticket-time">Posted at 10:30 AM</span>
+          </div>
+          <h2 class="ticket-subject">Course material access</h2>
+          <p class="ticket-preview">Unable to download the PDF for Week 3. Link returns 404.</p>
+          <div class="ticket-card-footer">
+            <div class="ticket-responder">
+              <img src="https://ui-avatars.com/api/?name=John+Snow&size=28" alt="" class="ticket-responder-avatar" />
+              Dr. John Snow
+            </div>
+            <a href="ticket-detail.html" class="btn-link">Open Ticket</a>
+          </div>
+        </article>
+
+        <article class="ticket-card" data-status="resolved">
+          <div class="ticket-card-header">
+            <span class="ticket-status-dot green" title="Resolved"></span>
+            <span class="ticket-id">Ticket# 2023-CS789</span>
+            <span class="ticket-status-label green">Resolved</span>
+            <span class="ticket-time">Posted at 2:15 PM</span>
+          </div>
+          <h2 class="ticket-subject">Grade clarification</h2>
+          <p class="ticket-preview">Request for review of Assignment 2 grade. Answer key was followed.</p>
+          <div class="ticket-card-footer">
+            <div class="ticket-responder">
+              <img src="https://ui-avatars.com/api/?name=Dr+Snow&size=28" alt="" class="ticket-responder-avatar" />
+              Dr. Snow
+            </div>
+            <a href="ticket-detail.html" class="btn-link">Open Ticket</a>
+          </div>
+        </article>
+      </div>
+
+      <nav class="pagination" aria-label="Tickets pagination">
+        <button type="button" disabled>Previous</button>
+        <a href="#" class="active" aria-current="page">1</a>
+        <a href="#">2</a>
+        <button type="button">Next</button>
+      </nav>
+    </main>
+    </div>
+  </div>
+
+  <script src="../api.config.js"></script>
+  <script src="../api.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

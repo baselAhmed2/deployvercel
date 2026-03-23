@@ -1,0 +1,14 @@
+/* Forgot password page extra styles */
+.back-to-login {
+  display: block;
+  text-align: center;
+  margin-top: 16px;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.back-to-login:hover {
+  color: #1EDFEF;
+}

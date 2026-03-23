@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Site Settings - TICKET LEAD</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-left">
+      <button type="button" class="sidebar-toggle" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+      <span class="brand">TICKET LEAD</span>
+      <span class="welcome-text">Welcome!</span>
+    </div>
+    <div class="header-right">
+      <img src="https://ui-avatars.com/api/?name=DR+Bahlol&background=6f42c1&color=fff" alt="" class="user-avatar" />
+      <span class="user-name">DR Bahlol</span>
+      <button type="button" class="user-menu-btn" aria-label="User menu"><i class="fas fa-chevron-down"></i></button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+  <div class="app-body">
+    <aside class="sidebar" id="sidebar" aria-hidden="true">
+      <div class="sidebar-header">
+        <span class="brand">TICKET LEAD</span>
+        <button type="button" class="sidebar-close" aria-label="Close menu"><i class="fas fa-times"></i></button>
+      </div>
+      <nav>
+        <ul class="nav-list">
+          <li class="nav-item"><a href="index.html" class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a></li>
+          <li class="nav-item"><a href="tickets.html" class="nav-link"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
+          <li class="nav-item"><a href="users.html" class="nav-link"><i class="fas fa-users"></i> Users</a></li>
+          <li class="nav-item"><a href="add-course.html" class="nav-link"><i class="fas fa-book"></i> Add Course</a></li>
+          <li class="nav-item"><a href="analysis.html" class="nav-link"><i class="fas fa-chart-bar"></i> Analysis</a></li>
+          <li class="nav-item"><a href="../login/index.html" class="nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+      </nav>
+      <div class="sidebar-footer">
+        <ul class="nav-list">
+          <li class="nav-item"><a href="site-settings.html" class="nav-link active"><i class="fas fa-cog"></i> Site Settings</a></li>
+        </ul>
+      </div>
+    </aside>
+    <div class="app-layout">
+      <main class="main-content">
+        <h1 class="page-title">Site Settings</h1>
+        <div class="detail-card danger-card">
+          <div>
+            <div class="danger-card-title"><i class="fas fa-info-circle"></i> Delete all Tickets Data</div>
+            <p class="danger-card-note">Ensure: Delete Include All Data <span class="except">Except Users</span></p>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span class="danger-card-meta">Created At 22-11-2024</span>
+            <button type="button" class="btn-danger" id="btn-delete-tickets"><i class="fas fa-trash-alt"></i> Delete Tickets</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script src="../api.config.js"></script>
+  <script src="../api.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
