@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { showToast } from '../../../utils/toast';
+import DriveAttachmentModal from '../../../components/DriveAttachmentModal';
 
 const STORAGE_KEY = 'ticket_last_choices';
 const LEVEL_KEY = 'ticket_student_level';
@@ -57,6 +58,11 @@ export default function StudentNewTicketPage() {
   const [doctorId, setDoctorId] = useState('');
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
+  const [driveModalOpen, setDriveModalOpen] = useState(false);
+
+  const handleAttachDrive = (link) => {
+    setBody((prev) => prev + (prev.trim() ? '\n\n' : '') + '📁 مرفق (Attachment): ' + link);
+  };
 
   const [subjects, setSubjects] = useState([]);
   const [doctors, setDoctors] = useState([]);
@@ -207,7 +213,12 @@ export default function StudentNewTicketPage() {
               <input type="text" className="form-input" placeholder="Enter Ticket Subject (min 5 characters)" value={title} onChange={(e) => setTitle(e.target.value)} required minLength={5} maxLength={200} />
             </div>
             <div className="form-group full-width">
-              <label className="form-label">Ticket Body <span className="required">*</span></label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <label className="form-label" style={{ marginBottom: 0 }}>Ticket Body <span className="required">*</span></label>
+                <button type="button" onClick={() => setDriveModalOpen(true)} style={{ background: 'none', border: 'none', color: '#6f42c1', cursor: 'pointer', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 'bold' }}>
+                  <i className="fas fa-paperclip"></i> Attach Files
+                </button>
+              </div>
               <textarea className="form-textarea" placeholder="Type ticket issue here.. (min 10 characters)" value={body} onChange={(e) => setBody(e.target.value)} required minLength={10} maxLength={2000}></textarea>
             </div>
           </div>
@@ -218,6 +229,11 @@ export default function StudentNewTicketPage() {
           </div>
         </form>
       </section>
+      <DriveAttachmentModal 
+        isOpen={driveModalOpen} 
+        onClose={() => setDriveModalOpen(false)} 
+        onAttach={handleAttachDrive} 
+      />
     </>
   );
 }

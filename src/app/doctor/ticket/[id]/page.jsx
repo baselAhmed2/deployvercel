@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { showToast } from '../../../../utils/toast';
+import DriveAttachmentModal from '../../../../components/DriveAttachmentModal';
 
 const STATUS_MAP = { 1: 'blue', 2: 'orange', 3: 'green', 4: 'red' };
 const STATUS_LABELS = { 1: 'New', 2: 'On-Going', 3: 'Resolved', 4: 'Rejected' };
@@ -33,6 +34,11 @@ export default function DoctorTicketDetail() {
   const [body, setBody] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [driveModalOpen, setDriveModalOpen] = useState(false);
+
+  const handleAttachDrive = (link) => {
+    setBody((prev) => prev + (prev.trim() ? '\n\n' : '') + '📁 مرفق (Attachment): ' + link);
+  };
 
   useEffect(() => {
     if (!ticketId || typeof window.TicketAPI === 'undefined' || !window.TicketAPI.getTicketById) {
@@ -225,7 +231,12 @@ export default function DoctorTicketDetail() {
               </div>
             </div>
             <div className="form-group full-width">
-              <label className="form-label">Ticket Body</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <label className="form-label" style={{ marginBottom: 0 }}>Ticket Body</label>
+                <button type="button" onClick={() => setDriveModalOpen(true)} style={{ background: 'none', border: 'none', color: '#6f42c1', cursor: 'pointer', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 'bold' }}>
+                  <i className="fas fa-paperclip"></i> إرفاق ملفات
+                </button>
+              </div>
               <textarea className="form-textarea" placeholder="Type your reply here.." value={body} onChange={(e) => setBody(e.target.value)} required></textarea>
             </div>
           </div>
@@ -237,6 +248,11 @@ export default function DoctorTicketDetail() {
         </form>
       </div>
       <Link href="/doctor/tickets" className="btn-primary" style={{ marginTop: 16 }}>Back to Tickets</Link>
+      <DriveAttachmentModal 
+        isOpen={driveModalOpen} 
+        onClose={() => setDriveModalOpen(false)} 
+        onAttach={handleAttachDrive} 
+      />
     </>
   );
 }

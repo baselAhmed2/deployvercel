@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { showToast } from '../../../../utils/toast';
+import DriveAttachmentModal from '../../../../components/DriveAttachmentModal';
 
 const STATUS_MAP = { 1: 'blue', 2: 'orange', 3: 'green', 4: 'red' };
 const STATUS_LABELS = { 1: 'Not Replied', 2: 'On-Going', 3: 'Resolved', 4: 'Rejected' };
@@ -24,6 +25,11 @@ export default function StudentTicketDetailPage() {
   const [error, setError] = useState('');
   const [body, setBody] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [driveModalOpen, setDriveModalOpen] = useState(false);
+
+  const handleAttachDrive = (link) => {
+    setBody((prev) => prev + (prev.trim() ? '\n\n' : '') + '📁 مرفق (Attachment): ' + link);
+  };
 
   useEffect(() => {
     if (!ticketId || typeof window.TicketAPI === 'undefined' || !window.TicketAPI.getTicketById) {
@@ -177,7 +183,12 @@ export default function StudentTicketDetailPage() {
           <form onSubmit={handleReply}>
             <div className="form-grid">
               <div className="form-group full-width">
-                <label className="form-label">Your Reply</label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <label className="form-label" style={{ marginBottom: 0 }}>Your Reply</label>
+                  <button type="button" onClick={() => setDriveModalOpen(true)} style={{ background: 'none', border: 'none', color: '#6f42c1', cursor: 'pointer', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 'bold' }}>
+                    <i className="fas fa-paperclip"></i> إرفاق ملفات
+                  </button>
+                </div>
                 <textarea className="form-textarea" placeholder="Type your reply here.." value={body} onChange={(e) => setBody(e.target.value)} required></textarea>
               </div>
             </div>
@@ -192,6 +203,11 @@ export default function StudentTicketDetailPage() {
       {!canReply && status === 3 && <p style={{ color: '#666', padding: 16 }}>This ticket is resolved. You cannot add more replies.</p>}
       {!canReply && status === 4 && <p style={{ color: '#842029', padding: 16, background: '#f8d7da', borderRadius: 8 }}>This ticket has been <strong>rejected</strong>. You cannot add more replies.</p>}
       <Link href="/student" className="btn-primary" style={{ marginTop: 16 }}>Back to Tickets</Link>
+      <DriveAttachmentModal 
+        isOpen={driveModalOpen} 
+        onClose={() => setDriveModalOpen(false)} 
+        onAttach={handleAttachDrive} 
+      />
     </>
   );
 }
