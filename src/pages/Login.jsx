@@ -103,7 +103,10 @@ export default function Login() {
                 <input type="checkbox" name="remember" />
                 <span>Remember me</span>
               </label>
-              <Link to="/forgettenpassword" className="forgot-link">Forgot Password?</Link>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
+                <Link to="/forgettenpassword" className="forgot-link">Forgot Password?</Link>
+                <Link to="/register" className="forgot-link">Don't have an account? Register</Link>
+              </div>
             </div>
             {error && <p role="alert" style={{ color: '#dc3545', fontSize: '0.9rem', marginTop: 8 }}>{error}</p>}
             <button type="submit" className="sign-in-btn">

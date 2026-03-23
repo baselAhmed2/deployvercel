@@ -4,6 +4,8 @@ import './styles/login.css';
 import './styles/dashboard.css';
 
 import Login from './pages/Login';
+import Register from './pages/Register';
+import VerifyOtp from './pages/VerifyOtp';
 import ForgotPassword from './pages/ForgotPassword';
 import DashboardLayout from './components/DashboardLayout';
 import StudentTickets from './pages/student/StudentTickets';
@@ -54,7 +56,7 @@ const adminSidebarFooter = [
 function BodyClass() {
   const { pathname } = useLocation();
   useEffect(() => {
-    const isLogin = pathname === '/' || pathname.startsWith('/forgettenpassword');
+    const isLogin = pathname === '/' || pathname.startsWith('/forgettenpassword') || pathname === '/register' || pathname === '/verify-otp';
     document.body.className = isLogin ? 'login-body' : 'dashboard-body';
   }, [pathname]);
   return null;
@@ -66,6 +68,8 @@ export default function App() {
       <BodyClass />
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/verify-otp" element={<VerifyOtp />} />
         <Route path="/forgettenpassword" element={<ForgotPassword />} />
         <Route path="/student" element={<DashboardLayout navItems={studentNav} userDisplayName="Alex Robert" />}>
           <Route index element={<StudentTickets />} />
