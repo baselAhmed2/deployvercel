@@ -8,6 +8,7 @@ export const doctorNav = [
   { href: '/doctor', label: 'Dashboard', icon: 'fas fa-th-large', end: true },
   { href: '/doctor/my-courses', label: 'My Courses', icon: 'fas fa-book' },
   { href: '/doctor/tickets', label: 'Tickets', icon: 'fas fa-ticket-alt' },
+  { href: '/doctor/security', label: 'Security', icon: 'fas fa-shield-alt' },
   { href: '/', label: 'Logout', icon: 'fas fa-sign-out-alt', end: true, danger: true },
 ];
 

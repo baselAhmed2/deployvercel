@@ -82,18 +82,25 @@ export default function EmailPromptModal({ onClose }) {
         </div>
 
         <h2 style={{ color: '#fff', fontSize: '22px', fontWeight: 700, marginBottom: '10px', textAlign: 'center' }}>
-          إشعارات التذاكر اليومية
+          أمان حسابك ومتابعة طلابك في إيدك! 🛡️
         </h2>
-        <p style={{ color: '#a0aec0', fontSize: '14px', marginBottom: '28px', textAlign: 'center', lineHeight: 1.7 }}>
-          أدخل إيميلك لتصلك رسالة يومية عند وجود تذاكر بحاجة للرد
+        <p style={{ color: '#a0aec0', fontSize: '14px', marginBottom: '16px', textAlign: 'center', lineHeight: 1.7 }}>
+          يا دكتور، عشان نضمنلك أقصى حماية لحسابك وفي نفس الوقت ميفوتكش أي استفسارات أو تذاكر مهمة.. ضيف إيميلك دلوقتي وهنبعتلك تنبيهات يومية بكل جديد ونحافظ على أمان حسابك. متكسلش، خطوة بسيطة هتفرق كتير! ✨
         </p>
+
+        <div style={{ background: 'rgba(49, 130, 206, 0.1)', borderRight: '3px solid #3182ce', padding: '10px 14px', borderRadius: '8px', marginBottom: '24px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <i className="fas fa-lightbulb" style={{ color: '#63b3ed', fontSize: '16px' }}></i>
+          <p style={{ margin: 0, fontSize: '12px', color: '#bee3f8', lineHeight: 1.5, textAlign: 'right' }}>
+            <strong>نصيحة:</strong> مش لازم إيميل الجامعة! تقدر تستخدم أي إيميل شخصي بتفتحه كتير (زي Gmail أو Yahoo) عشان تتابع براحتك.
+          </p>
+        </div>
 
         <label style={{ color: '#e2e8f0', fontSize: '14px', fontWeight: 600, display: 'block', marginBottom: '8px' }}>
           البريد الإلكتروني
         </label>
         <input
           type="email"
-          placeholder="example@university.edu"
+          placeholder="مثال: dr.name@gmail.com"
           value={email}
           onChange={e => { setEmail(e.target.value); setError(''); }}
           onKeyDown={e => e.key === 'Enter' && handleSave()}
