@@ -1,13 +1,10 @@
-const ENV_URL = typeof process !== 'undefined' && process.env && process.env.NEXT_PUBLIC_API_BASE_URL ? process.env.NEXT_PUBLIC_API_BASE_URL : '';
-const BACKEND = ENV_URL.includes('bistest.runasp.net') ? 'https://tiketapp-api.icydune-2fcf3dd1.germanywestcentral.azurecontainerapps.io' : ENV_URL;
-
-const PROXY_PREFIX = '/api/proxy';
+const BACKEND_URL = 'https://tiketapp-api.icydune-2fcf3dd1.germanywestcentral.azurecontainerapps.io';
 
 function getProxyUrl(path) {
-  if (typeof window !== 'undefined') {
-    return `${window.location.origin}${PROXY_PREFIX}${path}`;
-  }
-  return `${PROXY_PREFIX}${path}`;
+  // Fix: Bypassing the Vercel Next.js Proxy completely 
+  // so the frontend browser talks directly to the Azure Backend.
+  // This removes Vercel timeout errors and improves scalability.
+  return `${BACKEND_URL}${path}`;
 }
 
 function getAuthHeader() {

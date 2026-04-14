@@ -367,3 +367,4 @@ FodyWeavers.xsd
 # Next.js
 .next/
 out/
+.vercel
