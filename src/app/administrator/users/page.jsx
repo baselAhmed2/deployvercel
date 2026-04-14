@@ -40,6 +40,9 @@ function AdminUsersContent() {
   const [pagination, setPagination] = useState({ totalPages: 1 });
   const [newUserOpen, setNewUserOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
+  const [userToReset, setUserToReset] = useState(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
 
   useEffect(() => {
     if (typeof window.TicketAPI === 'undefined' || !window.TicketAPI.getAdminUsers) {
@@ -122,6 +125,37 @@ function AdminUsersContent() {
     setUserToDelete(null);
   };
 
+  const handleResetPasswordClick = (user) => {
+    setUserToReset(user);
+    setNewPassword('');
+  };
+
+  const handleCancelReset = () => {
+    setUserToReset(null);
+    setNewPassword('');
+  };
+
+  const handleConfirmReset = () => {
+    if (!userToReset || !newPassword) return;
+    const userId = userToReset.id ?? userToReset.Id;
+    if (!userId || !window.TicketAPI?.resetDoctorPassword) {
+      setUserToReset(null);
+      return;
+    }
+    setResetLoading(true);
+    window.TicketAPI.resetDoctorPassword(userId, newPassword)
+      .then(() => {
+        showToast('Doctor password reset successfully.');
+        setUserToReset(null);
+      })
+      .catch((err) => {
+        showToast((err && err.message) ? err.message : 'Failed to reset password.', 'error');
+      })
+      .finally(() => {
+        setResetLoading(false);
+      });
+  };
+
   const dotClass = (role) => {
     const r = (role ?? '').toLowerCase();
     if (r === 'doctor') return 'user-card-dot doctor';
@@ -196,6 +230,11 @@ function AdminUsersContent() {
                   </div>
                   <div className="user-card-actions">
                     <Link href={userDetailHref(user)} className="btn-primary btn-sm"><i className="fas fa-user"></i> View Details</Link>
+                    {role?.toLowerCase() === 'doctor' && (
+                      <button type="button" className="btn-primary btn-sm" style={{ background: '#17a2b8', border: 'none' }} onClick={() => handleResetPasswordClick(user)}>
+                        <i className="fas fa-key"></i> Reset Password
+                      </button>
+                    )}
                     <button type="button" className="btn-danger" onClick={() => handleDeleteClick(user)}><i className="fas fa-trash-alt"></i> Delete User</button>
                   </div>
                 </div>
@@ -226,6 +265,29 @@ function AdminUsersContent() {
             <div className="confirm-modal-actions">
               <button type="button" className="btn-primary" onClick={handleCancelDelete}>Cancel</button>
               <button type="button" className="btn-danger" onClick={handleConfirmDelete}><i className="fas fa-trash-alt"></i> Delete</button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {userToReset && createPortal(
+        <div className="confirm-overlay" onClick={handleCancelReset} role="dialog" aria-modal="true" aria-labelledby="confirm-reset-title">
+          <div className="confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <h3 id="confirm-reset-title">Reset Doctor Password</h3>
+            <p>Enter the new password for {userToReset.name ?? userToReset.Name ?? 'this doctor'}:</p>
+            <input
+              type="text"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="New Password"
+              style={{ width: '100%', padding: '10px', marginTop: '10px', borderRadius: '6px', border: '1px solid #ccc' }}
+            />
+            <div className="confirm-modal-actions" style={{ marginTop: '20px' }}>
+              <button type="button" className="btn-danger" onClick={handleCancelReset} style={{ background: '#6c757d', border: 'none' }}>Cancel</button>
+              <button type="button" className="btn-primary" onClick={handleConfirmReset} disabled={resetLoading || !newPassword}>
+                <i className={resetLoading ? "fas fa-spinner fa-spin" : "fas fa-key"}></i> {resetLoading ? 'Resetting...' : 'Reset'}
+              </button>
             </div>
           </div>
         </div>,

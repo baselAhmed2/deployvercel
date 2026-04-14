@@ -98,6 +98,12 @@ export const TicketAPI = {
   getDoctorSubjects() {
     return request('/api/Doctor/subjects');
   },
+  updateDoctorNotificationEmail(email) {
+    return request('/api/Doctor/notification-email', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
   updateTicketStatus(ticketId, status) {
     return request(`/api/Tickets/${encodeURIComponent(ticketId)}/status`, {
       method: 'PUT',
@@ -248,6 +254,12 @@ export const TicketAPI = {
     const params = new URLSearchParams({ pageIndex, pageSize });
     if (status !== null) params.set('status', status);
     return request(`/api/Admin/my-doctor-tickets?${params}`);
+  },
+  resetDoctorPassword(doctorId, newPassword) {
+    return request(`/api/Admin/doctors/${encodeURIComponent(doctorId)}/reset-password`, {
+      method: 'PUT',
+      body: JSON.stringify({ newPassword }),
+    });
   },
   createUser(payload) {
     return this.createAdminUser(payload);

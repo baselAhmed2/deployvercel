@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { TicketAPI } from '../lib/api';
+import EmailPromptModal from './EmailPromptModal';
 
 function getStored(key) {
   if (typeof window === 'undefined') return null;
@@ -16,6 +17,7 @@ export default function DashboardLayoutNext({ userDisplayName = 'Alex Robert', u
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [authorized, setAuthorized] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [showEmailPrompt, setShowEmailPrompt] = useState(false);
 
   // Initialize dark mode from localStorage on mount
   useEffect(() => {
@@ -42,6 +44,16 @@ export default function DashboardLayoutNext({ userDisplayName = 'Alex Robert', u
       return;
     }
     setAuthorized(true);
+
+    const userRole = getStored('userRole')?.toLowerCase();
+    const isDoctorOrAdmin = userRole === 'doctor' || userRole === 'superadmin' || userRole === 'subadmin';
+    const notifSet = getStored('notifEmailSet');
+    const sessionSkip = sessionStorage.getItem('notifEmailSessionSkip');
+
+    if (isDoctorOrAdmin && notifSet !== 'true' && notifSet !== 'skipped' && !sessionSkip) {
+      // Delay prompt slightly to let dashboard load
+      setTimeout(() => setShowEmailPrompt(true), 1500);
+    }
   }, [router]);
 
   if (!authorized) {
@@ -241,6 +253,10 @@ export default function DashboardLayoutNext({ userDisplayName = 'Alex Robert', u
           </main>
         </div>
       </div>
+
+      {showEmailPrompt && (
+        <EmailPromptModal onClose={() => setShowEmailPrompt(false)} />
+      )}
     </>
   );
 }

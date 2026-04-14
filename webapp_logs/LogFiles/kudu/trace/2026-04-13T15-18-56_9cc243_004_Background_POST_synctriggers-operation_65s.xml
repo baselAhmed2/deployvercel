@@ -1,0 +1,9 @@
+<step title="BackgroundTrace" date="2026-04-13T15:18:56.452" instance="9cc243" url="synctriggers-operation" method="POST" >
+  <step title="Cleanup Xml Logs" date="2026-04-13T15:18:56.467" /><!-- duration: 47ms -->
+  <step title="Updating shutdown sentinel last write time" date="2026-04-13T15:18:56.530" SemaphoreCount="6" /><!-- duration: 16ms -->
+  <step title="Delaying &apos;00:01:00&apos; for Functions site to restart." date="2026-04-13T15:18:56.577" /><!-- duration: 31ms -->
+  <step title="Begin HttpPost https://tktsys-basel-487.azurewebsites.net/admin/host/synctriggers, x-ms-request-id: 0e46280b-2725-4910-b6a6-d535076be026" date="2026-04-13T15:19:56.648" /><!-- duration: 47ms -->
+  <step title="End HttpPost, status: OK" date="2026-04-13T15:20:01.112" /><!-- duration: 47ms -->
+  <step title="Syncing function triggers by calling the functions runtime site successful." date="2026-04-13T15:20:01.174" /><!-- duration: 31ms -->
+  <step title="Deleting shutdown sentinel file" date="2026-04-13T15:20:01.221" SemaphoreCount="8" /><!-- duration: 16ms -->
+</step><!-- duration: 64816ms -->
