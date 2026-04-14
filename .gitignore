@@ -366,7 +366,4 @@ FodyWeavers.xsd
 
 # Next.js
 .next/
-out/
-.env
-.env.local
-.env*.local
+out/
