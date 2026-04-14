@@ -20,6 +20,7 @@ function getAuthHeader() {
   }
 }
 
+
 function request(path, options = {}) {
   const url = getProxyUrl(path);
 
