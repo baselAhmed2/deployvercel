@@ -1,4 +1,4 @@
-const BACKEND = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.API_BACKEND_URL || 'https://bistest.runasp.net';
+const BACKEND = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://tiketapp-api.icydune-2fcf3dd1.germanywestcentral.azurecontainerapps.io';
 
 export const dynamic = 'force-dynamic';
 
