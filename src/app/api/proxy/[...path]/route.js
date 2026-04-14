@@ -1,5 +1,4 @@
-const ENV_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
-const BACKEND = ENV_URL.includes('bistest.runasp.net') ? 'https://tiketapp-api.icydune-2fcf3dd1.germanywestcentral.azurecontainerapps.io' : (ENV_URL || 'https://tiketapp-api.icydune-2fcf3dd1.germanywestcentral.azurecontainerapps.io');
+const BACKEND = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://tiketapp-api.icydune-2fcf3dd1.germanywestcentral.azurecontainerapps.io';
 
 export const dynamic = 'force-dynamic';
 
