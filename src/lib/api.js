@@ -18,18 +18,18 @@ function getAuthHeader() {
 }
 
 
-function request(path, options = {}) {
+async function request(path, options = {}, retries = 2, delay = 1500) {
   const url = getProxyUrl(path);
 
-  // If body is FormData, don't set 'Content-Type' manually
-  // so the browser can automatically set it to 'multipart/form-data; boundary=...'
   const isFormData = options.body instanceof FormData;
   const defaultHeaders = isFormData ? {} : { 'Content-Type': 'application/json' };
 
-  return fetch(url, {
-    headers: { ...defaultHeaders, ...getAuthHeader(), ...options.headers },
-    ...options,
-  }).then((res) => {
+  try {
+    const res = await fetch(url, {
+      headers: { ...defaultHeaders, ...getAuthHeader(), ...options.headers },
+      ...options,
+    });
+
     if (!res.ok) {
       if (res.status === 401) {
         try {
@@ -44,12 +44,40 @@ function request(path, options = {}) {
           window.location.href = '/';
         }
       }
+
+      // Automatically retry on Server Errors (502 Bad Gateway / 503 Unavailable / 500)
+      // This is crucial for transparently handling "Cold Starts" without crashing the frontend.
+      if ((res.status === 502 || res.status === 503 || res.status === 500) && retries > 0) {
+        console.warn(`Server cold start detected (${res.status}). Retrying... (${retries} retries left)`);
+        await new Promise(r => setTimeout(r, delay));
+        return request(path, options, retries - 1, delay * 1.5);
+      }
+
       const err = new Error(res.statusText || 'Request failed');
       err.status = res.status;
-      return res.json().then((body) => { err.message = body?.message || err.message; throw err; }).catch(() => { throw err; });
+      try {
+        const body = await res.json();
+        err.message = body?.message || err.message;
+      } catch (e) {
+        // Fallback if parsing fails
+      }
+      throw err;
     }
-    return res.headers.get('content-type')?.includes('json') ? res.json() : res.text();
-  });
+
+    if (res.headers.get('content-type')?.includes('json')) {
+      return await res.json();
+    }
+    return await res.text();
+
+  } catch (error) {
+    // If it's a network error (like Failed to fetch) due to server booting up/dropped connection
+    if (retries > 0 && (error.message === 'Failed to fetch' || error.name === 'TypeError')) {
+      console.warn(`Network error, possibly cold start. Retrying... (${retries} retries left)`);
+      await new Promise(r => setTimeout(r, delay));
+      return request(path, options, retries - 1, delay * 1.5);
+    }
+    throw error;
+  }
 }
 
 export const TicketAPI = {
