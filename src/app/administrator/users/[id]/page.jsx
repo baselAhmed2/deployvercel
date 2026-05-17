@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { showToast } from '../../../../utils/toast';
+import { TicketAPI } from '../../../../lib/api';
 
 function roleToLabel(r) {
   const s = (r ?? '').toLowerCase();
@@ -39,12 +40,12 @@ export default function AdminUserDetail() {
   const isSuperAdmin = userRole === 'SuperAdmin';
 
   useEffect(() => {
-    if (!id || typeof window.TicketAPI === 'undefined' || !window.TicketAPI.getAdminUserById) {
+    if (!id) {
       setLoading(false);
-      if (!id) setError('Invalid user.');
+      setError('Invalid user.');
       return;
     }
-    window.TicketAPI.getAdminUserById(id)
+    TicketAPI.getAdminUserById(id)
       .then((data) => {
         setUser(data);
         setSsn(data?.ssn ?? data?.Ssn ?? data?.SSN ?? '');
@@ -95,41 +96,11 @@ export default function AdminUserDetail() {
     
     try {
       // 1. Update Identity (ID, Name, Program)
-      const doUpdateIdentity = window.TicketAPI?.updateUserIdentity
-        ? window.TicketAPI.updateUserIdentity(id, editingId.trim(), editingName.trim(), editingProgram.trim())
-        : fetch(`https://tiketapp-fagbbecbexf9f0ed.uaenorth-01.azurewebsites.net/api/Admin/users/${id}/identity`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify({ newId: editingId.trim(), newName: editingName.trim(), newProgram: editingProgram.trim() })
-          }).then(async (res) => {
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || 'Failed to update user identity');
-            return data;
-          });
-
-      await doUpdateIdentity;
+      await TicketAPI.updateUserIdentity(id, editingId.trim(), editingName.trim(), editingProgram.trim());
 
       // 2. Update SSN if it's a student
       if (role.toLowerCase() === 'student' && ssn !== (user.ssn ?? user.Ssn ?? user.SSN ?? '')) {
-        const doUpdateSsn = window.TicketAPI?.updateStudentSsn 
-          ? window.TicketAPI.updateStudentSsn(editingId.trim(), ssn.trim())
-          : fetch(`https://tiketapp-fagbbecbexf9f0ed.uaenorth-01.azurewebsites.net/api/Admin/users/${editingId.trim()}/ssn`, {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-              },
-              body: JSON.stringify({ newSsn: ssn.trim() })
-            }).then(async (res) => {
-              const data = await res.json();
-              if (!res.ok) throw new Error(data.message || 'Failed to update SSN');
-              return data;
-            });
-            
-        await doUpdateSsn;
+        await TicketAPI.updateStudentSsn(editingId.trim(), ssn.trim());
       }
 
       showToast('User data updated successfully.');
@@ -151,23 +122,8 @@ export default function AdminUserDetail() {
       return;
     }
 
-    const doReset = window.TicketAPI?.resetAnyUserPassword
-      ? window.TicketAPI.resetAnyUserPassword(id, newPassword)
-      : fetch(`https://tiketapp-fagbbecbexf9f0ed.uaenorth-01.azurewebsites.net/api/Admin/users/${id}/reset-password`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          body: JSON.stringify({ newPassword })
-        }).then(async (res) => {
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.message || 'Failed to reset password');
-          return data;
-        });
-
     setResetPasswordLoading(true);
-    doReset
+    TicketAPI.resetAnyUserPassword(id, newPassword)
       .then(() => {
         showToast('Password reset successfully.');
         setNewPassword('');

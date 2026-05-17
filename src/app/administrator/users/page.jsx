@@ -142,22 +142,9 @@ function AdminUsersContent() {
     
     setResetLoading(true);
 
-    const resetCall = isSuperAdmin 
-      ? fetch(`https://tiketapp-fagbbecbexf9f0ed.uaenorth-01.azurewebsites.net/api/Admin/users/${userId}/reset-password`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          body: JSON.stringify({ newPassword })
-        }).then(async (res) => {
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.message || 'Failed to reset password');
-          return data;
-        })
-      : window.TicketAPI?.resetDoctorPassword
-        ? window.TicketAPI.resetDoctorPassword(userId, newPassword)
-        : Promise.reject(new Error('API not available'));
+    const resetCall = window.TicketAPI?.resetAnyUserPassword
+      ? window.TicketAPI.resetAnyUserPassword(userId, newPassword)
+      : Promise.reject(new Error('API not available'));
 
     resetCall
       .then(() => {
