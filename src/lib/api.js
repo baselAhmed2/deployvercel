@@ -310,10 +310,10 @@ export const TicketAPI = {
       body: JSON.stringify({ newSsn }),
     });
   },
-  updateUserIdentity(userId, newId, newName) {
+  updateUserIdentity(userId, newId, newName, newProgram) {
     return request(`/api/Admin/users/${encodeURIComponent(userId)}/identity`, {
       method: 'PUT',
-      body: JSON.stringify({ newId, newName }),
+      body: JSON.stringify({ newId, newName, newProgram }),
     });
   },
   getSystemLogs({ pageIndex = 1, pageSize = 20, userIdFilter = '', actionType = '', search = '' } = {}) {

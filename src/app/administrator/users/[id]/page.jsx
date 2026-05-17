@@ -30,6 +30,7 @@ export default function AdminUserDetail() {
   const [updateSsnLoading, setUpdateSsnLoading] = useState(false);
   const [editingId, setEditingId] = useState('');
   const [editingName, setEditingName] = useState('');
+  const [editingProgram, setEditingProgram] = useState('');
   const [updateIdentityLoading, setUpdateIdentityLoading] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [resetPasswordLoading, setResetPasswordLoading] = useState(false);
@@ -49,6 +50,7 @@ export default function AdminUserDetail() {
         setSsn(data?.ssn ?? data?.Ssn ?? data?.SSN ?? '');
         setEditingId(data?.userName ?? data?.UserName ?? data?.id ?? data?.Id ?? id);
         setEditingName(data?.name ?? data?.Name ?? '');
+        setEditingProgram(data?.program ?? data?.Program ?? '');
       })
       .catch((err) => setError((err && err.message) ? err.message : 'Failed to load user.'))
       .finally(() => setLoading(false));
@@ -123,14 +125,14 @@ export default function AdminUserDetail() {
     }
 
     const doUpdate = window.TicketAPI?.updateUserIdentity
-      ? window.TicketAPI.updateUserIdentity(id, editingId.trim(), editingName.trim())
+      ? window.TicketAPI.updateUserIdentity(id, editingId.trim(), editingName.trim(), editingProgram.trim())
       : fetch(`https://tiketapp-fagbbecbexf9f0ed.uaenorth-01.azurewebsites.net/api/Admin/users/${id}/identity`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
-          body: JSON.stringify({ newId: editingId.trim(), newName: editingName.trim() })
+          body: JSON.stringify({ newId: editingId.trim(), newName: editingName.trim(), newProgram: editingProgram.trim() })
         }).then(async (res) => {
           const data = await res.json();
           if (!res.ok) throw new Error(data.message || 'Failed to update user identity');
@@ -140,11 +142,11 @@ export default function AdminUserDetail() {
     setUpdateIdentityLoading(true);
     doUpdate
       .then(() => {
-        showToast('User identity updated successfully.');
+        showToast('User data updated successfully.');
         if (editingId.trim() !== id) {
             window.location.href = `/administrator/users/${editingId.trim()}`;
         } else {
-            setUser((prev) => ({ ...prev, name: editingName.trim(), userName: editingId.trim() }));
+            setUser((prev) => ({ ...prev, name: editingName.trim(), userName: editingId.trim(), program: editingProgram.trim() }));
         }
       })
       .catch((err) => {
@@ -230,16 +232,21 @@ export default function AdminUserDetail() {
             </div>
             <div className="form-group">
               <label className="form-label">Program</label>
-              <input type="text" className="form-input" value={program} readOnly />
+              <input 
+                type="text" 
+                className="form-input" 
+                value={editingProgram} 
+                onChange={(e) => setEditingProgram(e.target.value)}
+              />
             </div>
             <div className="form-group" style={{ gridColumn: '1 / -1' }}>
               <button 
                 type="button" 
                 className="btn-primary" 
-                disabled={updateIdentityLoading || (editingId === userName && editingName === name)}
+                disabled={updateIdentityLoading || (editingId === userName && editingName === name && editingProgram === program)}
                 onClick={handleUpdateIdentity}
               >
-                {updateIdentityLoading ? <i className="fas fa-spinner fa-spin"></i> : 'Save ID & Name'}
+                {updateIdentityLoading ? <i className="fas fa-spinner fa-spin"></i> : 'Save User Data'}
               </button>
             </div>
             {role.toLowerCase() === 'student' && (
