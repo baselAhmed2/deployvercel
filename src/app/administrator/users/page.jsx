@@ -233,11 +233,6 @@ function AdminUsersContent() {
                   </div>
                   <div className="user-card-actions">
                     <Link href={userDetailHref(user)} className="btn-primary btn-sm"><i className="fas fa-user"></i> View Details</Link>
-                    {(isSuperAdmin || role?.toLowerCase() === 'doctor') && (
-                      <button type="button" className="btn-primary btn-sm" style={{ background: '#17a2b8', border: 'none' }} onClick={() => handleResetPasswordClick(user)}>
-                        <i className="fas fa-key"></i> Reset Password
-                      </button>
-                    )}
                     <button type="button" className="btn-danger" onClick={() => handleDeleteClick(user)}><i className="fas fa-trash-alt"></i> Delete User</button>
                   </div>
                 </div>
