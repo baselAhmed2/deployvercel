@@ -28,6 +28,9 @@ export default function AdminUserDetail() {
   const [error, setError] = useState('');
   const [ssn, setSsn] = useState('');
   const [updateSsnLoading, setUpdateSsnLoading] = useState(false);
+  const [editingId, setEditingId] = useState('');
+  const [editingName, setEditingName] = useState('');
+  const [updateIdentityLoading, setUpdateIdentityLoading] = useState(false);
 
   useEffect(() => {
     if (!id || typeof window.TicketAPI === 'undefined' || !window.TicketAPI.getAdminUserById) {
@@ -39,6 +42,8 @@ export default function AdminUserDetail() {
       .then((data) => {
         setUser(data);
         setSsn(data?.ssn ?? data?.Ssn ?? data?.SSN ?? '');
+        setEditingId(data?.userName ?? data?.UserName ?? data?.id ?? data?.Id ?? id);
+        setEditingName(data?.name ?? data?.Name ?? '');
       })
       .catch((err) => setError((err && err.message) ? err.message : 'Failed to load user.'))
       .finally(() => setLoading(false));
@@ -106,6 +111,43 @@ export default function AdminUserDetail() {
       .finally(() => {
         setUpdateSsnLoading(false);
       });
+  const handleUpdateIdentity = () => {
+    if (!editingId.trim() || !editingName.trim()) {
+      showToast('ID and Name are required.', 'error');
+      return;
+    }
+
+    const doUpdate = window.TicketAPI?.updateUserIdentity
+      ? window.TicketAPI.updateUserIdentity(id, editingId.trim(), editingName.trim())
+      : fetch(`https://tiketapp-fagbbecbexf9f0ed.uaenorth-01.azurewebsites.net/api/Admin/users/${id}/identity`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({ newId: editingId.trim(), newName: editingName.trim() })
+        }).then(async (res) => {
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || 'Failed to update user identity');
+          return data;
+        });
+
+    setUpdateIdentityLoading(true);
+    doUpdate
+      .then(() => {
+        showToast('User identity updated successfully.');
+        if (editingId.trim() !== id) {
+            window.location.href = `/administrator/users/${editingId.trim()}`;
+        } else {
+            setUser((prev) => ({ ...prev, name: editingName.trim(), userName: editingId.trim() }));
+        }
+      })
+      .catch((err) => {
+        showToast((err && err.message) ? err.message : 'Failed to update user identity.', 'error');
+      })
+      .finally(() => {
+        setUpdateIdentityLoading(false);
+      });
   };
 
   return (
@@ -131,12 +173,36 @@ export default function AdminUserDetail() {
               </div>
             </div>
             <div className="form-group">
+              <label className="form-label">User ID</label>
+              <input 
+                type="text" 
+                className="form-input" 
+                value={editingId} 
+                onChange={(e) => setEditingId(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
               <label className="form-label">Full Name</label>
-              <input type="text" className="form-input" value={name} readOnly />
+              <input 
+                type="text" 
+                className="form-input" 
+                value={editingName} 
+                onChange={(e) => setEditingName(e.target.value)}
+              />
             </div>
             <div className="form-group">
               <label className="form-label">Program</label>
               <input type="text" className="form-input" value={program} readOnly />
+            </div>
+            <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+              <button 
+                type="button" 
+                className="btn-primary" 
+                disabled={updateIdentityLoading || (editingId === userName && editingName === name)}
+                onClick={handleUpdateIdentity}
+              >
+                {updateIdentityLoading ? <i className="fas fa-spinner fa-spin"></i> : 'Save ID & Name'}
+              </button>
             </div>
             {role.toLowerCase() === 'student' && (
               <div className="form-group">
