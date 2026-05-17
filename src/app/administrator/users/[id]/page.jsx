@@ -27,7 +27,7 @@ export default function AdminUserDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [ssn, setSsn] = useState('');
-  const [updateSsnLoading, setUpdateSsnLoading] = useState(false);
+
   const [editingId, setEditingId] = useState('');
   const [editingName, setEditingName] = useState('');
   const [editingProgram, setEditingProgram] = useState('');
