@@ -249,7 +249,7 @@ export default function AdminUserDetail() {
                 {updateIdentityLoading ? <i className="fas fa-spinner fa-spin"></i> : 'Save User Data'}
               </button>
             </div>
-            {role.toLowerCase() === 'student' && (
+            {role.toLowerCase() === 'student' && isSuperAdmin && (
               <div className="form-group" style={{ gridColumn: '1 / -1' }}>
                 <label className="form-label">SSN (National ID)</label>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
