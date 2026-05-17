@@ -150,9 +150,25 @@ function StudentTicketsContent() {
           <Link href={`/student${statusFilter ? `?status=${statusFilter}` : ''}?page=${Math.max(1, pageParam - 1)}`}>
             <button type="button" disabled={pageParam <= 1}>Previous</button>
           </Link>
-          {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((p) => (
-            <Link key={p} href={`/student${statusFilter ? `?status=${statusFilter}&` : '?'}page=${p}`} className={p === pageParam ? 'active' : ''} aria-current={p === pageParam ? 'page' : undefined}>{p}</Link>
-          ))}
+          {(() => {
+            const total = pagination.totalPages;
+            const current = pageParam;
+            const items = [];
+            const showPages = new Set([1, total, current, current - 1, current + 1]);
+            let lastAdded = 0;
+            for (let i = 1; i <= total; i++) {
+              if (showPages.has(i)) {
+                if (lastAdded > 0 && i - lastAdded > 1) {
+                  items.push(<span key={`ellipsis-${i}`} style={{ padding: '8px 12px', color: '#6c757d', cursor: 'default' }}>...</span>);
+                }
+                items.push(
+                  <Link key={i} href={`/student${statusFilter ? `?status=${statusFilter}&` : '?'}page=${i}`} className={i === current ? 'active' : ''} aria-current={i === current ? 'page' : undefined}>{i}</Link>
+                );
+                lastAdded = i;
+              }
+            }
+            return items;
+          })()}
           <Link href={`/student${statusFilter ? `?status=${statusFilter}&` : '?'}page=${Math.min(pagination.totalPages, pageParam + 1)}`}>
             <button type="button" disabled={pageParam >= pagination.totalPages}>Next</button>
           </Link>

@@ -314,7 +314,7 @@ function RegisterForm() {
             <form className={`login-form ${shake ? 'shake-animation' : ''}`} onSubmit={handleOtpSubmit}>
               {successMsg && <p style={{ color: '#28a745', fontSize: '0.95rem', marginBottom: '1rem', textAlign: 'center', animation: 'pop 0.3s ease' }}>{successMsg}</p>}
               <p style={{ fontSize: '0.9rem', marginBottom: '1rem', color: '#cbd5e1', textAlign: 'center' }}>
-                We've sent a 6-digit code to <strong style={{color: '#fff'}}>{formData.email}</strong>. It is valid for 10 minutes.
+                We've sent a 6-digit code to <strong style={{ color: '#fff' }}>{formData.email}</strong>. It is valid for 10 minutes.
               </p>
               <div className="input-group">
                 <i className="fas fa-key input-icon" style={getIconStyle('otp')}></i>
