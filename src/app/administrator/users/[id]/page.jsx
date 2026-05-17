@@ -212,103 +212,154 @@ export default function AdminUserDetail() {
   };
 
   return (
-    <>
-      <div className="toolbar-row" style={{ marginBottom: 20 }}>
-        <h1 className="page-title">User Details</h1>
-        <Link href="/administrator/users" className="btn-primary">
-          <i className="fas fa-arrow-left"></i> Back to Users
+    <div className="fade-in" style={{ maxWidth: 800, margin: '0 auto', paddingBottom: 40 }}>
+      <div className="toolbar-row" style={{ marginBottom: 24 }}>
+        <h1 className="page-title" style={{ fontSize: '1.8rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(102, 126, 234, 0.1)', color: '#667eea', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <i className="fas fa-user-edit"></i>
+          </span>
+          User Profile & Settings
+        </h1>
+        <Link href="/administrator/users" className="btn-primary" style={{ background: '#f8fafc', color: '#475569', border: '1px solid #e2e8f0', boxShadow: 'none' }}>
+          <i className="fas fa-arrow-left"></i> Back to Directory
         </Link>
       </div>
-      <div className="detail-card" style={{ maxWidth: 480 }}>
-        <div className="detail-header" style={{ marginBottom: 16 }}>
-          <span className={dotClass(role)}></span>
-          <span className="ticket-id">User ID: {userName}</span>
-        </div>
-        <div className="detail-body">
-          <div className="form-grid" style={{ gap: 12 }}>
-            <div className="form-group">
-              <label className="form-label">Role</label>
-              <div className="form-input form-input--with-dot">
-                <span className={dotClass(role)}></span>
-                <span>{roleToLabel(role)}</span>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+        {/* Main Identity Card */}
+        <div className="detail-card" style={{ padding: 32, borderRadius: 16, border: '1px solid #edf2f7', boxShadow: '0 10px 25px rgba(0,0,0,0.02)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24, paddingBottom: 24, borderBottom: '1px solid #f1f5f9' }}>
+            <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '1.8rem', fontWeight: 'bold', boxShadow: '0 4px 10px rgba(102,126,234,0.3)' }}>
+              {editingName.charAt(0).toUpperCase() || 'U'}
+            </div>
+            <div>
+              <h2 style={{ margin: 0, fontSize: '1.4rem', color: '#2d3748', fontWeight: 700 }}>{name}</h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
+                <span style={{ background: '#edf2f7', color: '#4a5568', padding: '4px 10px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <i className="fas fa-id-badge"></i> {userName}
+                </span>
+                <span style={{ background: 'rgba(72, 187, 120, 0.1)', color: '#2f855a', padding: '4px 10px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <span className={dotClass(role)} style={{ margin: 0 }}></span> {roleToLabel(role)}
+                </span>
               </div>
             </div>
+          </div>
+
+          <h3 style={{ fontSize: '1.1rem', color: '#4a5568', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <i className="fas fa-address-card" style={{ color: '#a0aec0' }}></i> Identity Information
+          </h3>
+
+          <div className="form-grid" style={{ gap: 24 }}>
             <div className="form-group">
-              <label className="form-label">User ID</label>
-              <input 
-                type="text" 
-                className="form-input" 
-                value={editingId} 
-                onChange={(e) => setEditingId(e.target.value)}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Full Name</label>
-              <input 
-                type="text" 
-                className="form-input" 
-                value={editingName} 
-                onChange={(e) => setEditingName(e.target.value)}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Program</label>
-              <input 
-                type="text" 
-                className="form-input" 
-                value={editingProgram} 
-                onChange={(e) => setEditingProgram(e.target.value)}
-              />
-            </div>
-            {role.toLowerCase() === 'student' && (
-              <div className="form-group">
-                <label className="form-label">SSN (National ID)</label>
+              <label className="form-label" style={{ fontWeight: 600, color: '#4a5568' }}>User ID</label>
+              <div style={{ position: 'relative' }}>
+                <i className="fas fa-fingerprint" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#cbd5e1' }}></i>
                 <input 
                   type="text" 
                   className="form-input" 
-                  value={ssn} 
-                  onChange={(e) => setSsn(e.target.value)}
+                  value={editingId} 
+                  onChange={(e) => setEditingId(e.target.value)}
+                  style={{ paddingLeft: 40, borderColor: '#e2e8f0', borderRadius: 10 }}
                 />
               </div>
+            </div>
+            
+            <div className="form-group">
+              <label className="form-label" style={{ fontWeight: 600, color: '#4a5568' }}>Full Name</label>
+              <div style={{ position: 'relative' }}>
+                <i className="fas fa-user" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#cbd5e1' }}></i>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  value={editingName} 
+                  onChange={(e) => setEditingName(e.target.value)}
+                  style={{ paddingLeft: 40, borderColor: '#e2e8f0', borderRadius: 10 }}
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" style={{ fontWeight: 600, color: '#4a5568' }}>Program</label>
+              <div style={{ position: 'relative' }}>
+                <i className="fas fa-graduation-cap" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#cbd5e1' }}></i>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  value={editingProgram} 
+                  onChange={(e) => setEditingProgram(e.target.value)}
+                  style={{ paddingLeft: 40, borderColor: '#e2e8f0', borderRadius: 10 }}
+                />
+              </div>
+            </div>
+
+            {role.toLowerCase() === 'student' && (
+              <div className="form-group">
+                <label className="form-label" style={{ fontWeight: 600, color: '#4a5568' }}>SSN (National ID)</label>
+                <div style={{ position: 'relative' }}>
+                  <i className="fas fa-id-card" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#cbd5e1' }}></i>
+                  <input 
+                    type="text" 
+                    className="form-input" 
+                    value={ssn} 
+                    onChange={(e) => setSsn(e.target.value)}
+                    style={{ paddingLeft: 40, borderColor: '#e2e8f0', borderRadius: 10 }}
+                  />
+                </div>
+              </div>
             )}
-            <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+
+            <div className="form-group" style={{ gridColumn: '1 / -1', marginTop: 8 }}>
               <button 
                 type="button" 
                 className="btn-primary" 
                 disabled={updateIdentityLoading || (editingId === userName && editingName === name && editingProgram === program && ssn === (user.ssn ?? user.Ssn ?? user.SSN ?? ''))}
                 onClick={handleUpdateIdentity}
+                style={{ width: '100%', padding: '14px', borderRadius: 10, fontSize: '1.05rem', fontWeight: 600, boxShadow: '0 4px 12px rgba(102,126,234,0.25)', transition: 'all 0.2s' }}
               >
-                {updateIdentityLoading ? <i className="fas fa-spinner fa-spin"></i> : 'Save User Data'}
+                {updateIdentityLoading ? <><i className="fas fa-spinner fa-spin"></i> Saving Changes...</> : <><i className="fas fa-save"></i> Save All Identity Changes</>}
               </button>
             </div>
-            
-            {isSuperAdmin && (
-              <div className="form-group" style={{ gridColumn: '1 / -1', marginTop: 16, borderTop: '1px solid var(--border-color, #e2e8f0)', paddingTop: 16 }}>
-                <label className="form-label" style={{ color: '#dc3545' }}><i className="fas fa-key"></i> SuperAdmin: Reset Password</label>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  <input 
-                    type="text" 
-                    className="form-input" 
-                    placeholder="New password (min 6 chars)"
-                    value={newPassword} 
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    style={{ flex: 1, minWidth: 200 }}
-                  />
-                  <button 
-                    type="button" 
-                    className="btn-primary" 
-                    disabled={resetPasswordLoading}
-                    onClick={handleResetPassword}
-                    style={{ whiteSpace: 'nowrap', background: '#dc3545' }}
-                  >
-                    {resetPasswordLoading ? <i className="fas fa-spinner fa-spin"></i> : 'Reset Password'}
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         </div>
+
+        {/* Security Card (SuperAdmin) */}
+        {isSuperAdmin && (
+          <div className="detail-card" style={{ padding: 32, borderRadius: 16, border: '1px solid #fee2e2', background: '#fef2f2', boxShadow: '0 4px 15px rgba(220,53,69,0.05)' }}>
+            <h3 style={{ fontSize: '1.2rem', color: '#b91c1c', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ background: '#fee2e2', color: '#dc2626', width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <i className="fas fa-shield-alt"></i>
+              </span>
+              SuperAdmin Security Actions
+            </h3>
+            <p style={{ color: '#991b1b', fontSize: '0.9rem', marginBottom: 24, marginLeft: 46 }}>
+              Force reset this user's password. This action cannot be undone.
+            </p>
+
+            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginLeft: 46 }}>
+              <div style={{ flex: '1 1 250px', position: 'relative' }}>
+                <i className="fas fa-key" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#f87171' }}></i>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  placeholder="Enter new strong password..."
+                  value={newPassword} 
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  style={{ width: '100%', paddingLeft: 40, borderColor: '#fca5a5', borderRadius: 10, background: '#fff' }}
+                />
+              </div>
+              <button 
+                type="button" 
+                className="btn-primary" 
+                disabled={resetPasswordLoading || !newPassword || newPassword.length < 6}
+                onClick={handleResetPassword}
+                style={{ background: '#dc2626', borderColor: '#b91c1c', borderRadius: 10, padding: '0 24px', fontWeight: 600, boxShadow: '0 4px 12px rgba(220,38,38,0.2)' }}
+              >
+                {resetPasswordLoading ? <><i className="fas fa-spinner fa-spin"></i> Resetting...</> : <><i className="fas fa-exclamation-triangle"></i> Force Reset Password</>}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }
