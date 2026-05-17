@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { showToast } from '../../../../utils/toast';
 
 function roleToLabel(r) {
   const s = (r ?? '').toLowerCase();
@@ -25,6 +26,8 @@ export default function AdminUserDetail() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [ssn, setSsn] = useState('');
+  const [updateSsnLoading, setUpdateSsnLoading] = useState(false);
 
   useEffect(() => {
     if (!id || typeof window.TicketAPI === 'undefined' || !window.TicketAPI.getAdminUserById) {
@@ -33,7 +36,10 @@ export default function AdminUserDetail() {
       return;
     }
     window.TicketAPI.getAdminUserById(id)
-      .then(setUser)
+      .then((data) => {
+        setUser(data);
+        setSsn(data?.ssn ?? data?.Ssn ?? data?.SSN ?? '');
+      })
       .catch((err) => setError((err && err.message) ? err.message : 'Failed to load user.'))
       .finally(() => setLoading(false));
   }, [id]);
@@ -66,6 +72,42 @@ export default function AdminUserDetail() {
   const program = user.program ?? user.Program ?? '—';
   const userName = user.userName ?? user.UserName ?? user.id ?? user.Id ?? id;
 
+  const handleUpdateSsn = () => {
+    if (!ssn.trim()) {
+      showToast('Please enter an SSN.', 'error');
+      return;
+    }
+    
+    // Fallback if TicketAPI.updateStudentSsn is not yet available, directly call fetch
+    const doUpdate = window.TicketAPI?.updateStudentSsn 
+      ? window.TicketAPI.updateStudentSsn(id, ssn.trim())
+      : fetch(`https://tiketapp-fagbbecbexf9f0ed.uaenorth-01.azurewebsites.net/api/Admin/students/${id}/ssn`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({ newSsn: ssn.trim() })
+        }).then(async (res) => {
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || 'Failed to update SSN');
+          return data;
+        });
+
+    setUpdateSsnLoading(true);
+    doUpdate
+      .then(() => {
+        showToast('SSN updated successfully.');
+        setUser((prev) => ({ ...prev, ssn: ssn.trim() }));
+      })
+      .catch((err) => {
+        showToast((err && err.message) ? err.message : 'Failed to update SSN.', 'error');
+      })
+      .finally(() => {
+        setUpdateSsnLoading(false);
+      });
+  };
+
   return (
     <>
       <div className="toolbar-row" style={{ marginBottom: 20 }}>
@@ -96,6 +138,28 @@ export default function AdminUserDetail() {
               <label className="form-label">Program</label>
               <input type="text" className="form-input" value={program} readOnly />
             </div>
+            {role.toLowerCase() === 'student' && (
+              <div className="form-group">
+                <label className="form-label">SSN (National ID)</label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input 
+                    type="text" 
+                    className="form-input" 
+                    value={ssn} 
+                    onChange={(e) => setSsn(e.target.value)}
+                  />
+                  <button 
+                    type="button" 
+                    className="btn-primary" 
+                    disabled={updateSsnLoading}
+                    onClick={handleUpdateSsn}
+                    style={{ whiteSpace: 'nowrap' }}
+                  >
+                    {updateSsnLoading ? <i className="fas fa-spinner fa-spin"></i> : 'Update SSN'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

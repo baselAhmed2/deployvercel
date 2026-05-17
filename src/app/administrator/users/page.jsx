@@ -32,6 +32,7 @@ function AdminUsersContent() {
 
   const userRole = getStored('userRole');
   const isSubAdmin = userRole === 'SubAdmin';
+  const isSuperAdmin = userRole === 'SuperAdmin';
 
   const [users, setUsers] = useState([]);
   const [searchInput, setSearchInput] = useState(searchTerm);
@@ -138,14 +139,29 @@ function AdminUsersContent() {
   const handleConfirmReset = () => {
     if (!userToReset || !newPassword) return;
     const userId = userToReset.id ?? userToReset.Id;
-    if (!userId || !window.TicketAPI?.resetDoctorPassword) {
-      setUserToReset(null);
-      return;
-    }
+    
     setResetLoading(true);
-    window.TicketAPI.resetDoctorPassword(userId, newPassword)
+
+    const resetCall = isSuperAdmin 
+      ? fetch(`https://tiketapp-fagbbecbexf9f0ed.uaenorth-01.azurewebsites.net/api/Admin/users/${userId}/reset-password`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({ newPassword })
+        }).then(async (res) => {
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || 'Failed to reset password');
+          return data;
+        })
+      : window.TicketAPI?.resetDoctorPassword
+        ? window.TicketAPI.resetDoctorPassword(userId, newPassword)
+        : Promise.reject(new Error('API not available'));
+
+    resetCall
       .then(() => {
-        showToast('Doctor password reset successfully.');
+        showToast('Password reset successfully.');
         setUserToReset(null);
       })
       .catch((err) => {
@@ -230,7 +246,7 @@ function AdminUsersContent() {
                   </div>
                   <div className="user-card-actions">
                     <Link href={userDetailHref(user)} className="btn-primary btn-sm"><i className="fas fa-user"></i> View Details</Link>
-                    {role?.toLowerCase() === 'doctor' && (
+                    {(isSuperAdmin || role?.toLowerCase() === 'doctor') && (
                       <button type="button" className="btn-primary btn-sm" style={{ background: '#17a2b8', border: 'none' }} onClick={() => handleResetPasswordClick(user)}>
                         <i className="fas fa-key"></i> Reset Password
                       </button>
@@ -290,8 +306,8 @@ function AdminUsersContent() {
       {userToReset && createPortal(
         <div className="confirm-overlay" onClick={handleCancelReset} role="dialog" aria-modal="true" aria-labelledby="confirm-reset-title">
           <div className="confirm-modal" onClick={(e) => e.stopPropagation()}>
-            <h3 id="confirm-reset-title">Reset Doctor Password</h3>
-            <p>Enter the new password for {userToReset.name ?? userToReset.Name ?? 'this doctor'}:</p>
+            <h3 id="confirm-reset-title">Reset Password</h3>
+            <p>Enter the new password for {userToReset.name ?? userToReset.Name ?? 'this user'}:</p>
             <input
               type="text"
               value={newPassword}
