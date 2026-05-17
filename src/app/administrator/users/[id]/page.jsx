@@ -84,40 +84,7 @@ export default function AdminUserDetail() {
   const program = user.program ?? user.Program ?? '—';
   const userName = user.userName ?? user.UserName ?? user.id ?? user.Id ?? id;
 
-  const handleUpdateSsn = () => {
-    if (!ssn.trim()) {
-      showToast('Please enter an SSN.', 'error');
-      return;
-    }
-    
-    // Fallback if TicketAPI.updateStudentSsn is not yet available, directly call fetch
-    const doUpdate = window.TicketAPI?.updateStudentSsn 
-      ? window.TicketAPI.updateStudentSsn(id, ssn.trim())
-      : fetch(`https://tiketapp-fagbbecbexf9f0ed.uaenorth-01.azurewebsites.net/api/Admin/students/${id}/ssn`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          body: JSON.stringify({ newSsn: ssn.trim() })
-        }).then(async (res) => {
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.message || 'Failed to update SSN');
-          return data;
-        });
 
-    setUpdateSsnLoading(true);
-    doUpdate
-      .then(() => {
-        showToast('SSN updated successfully.');
-        setUser((prev) => ({ ...prev, ssn: ssn.trim() }));
-      })
-      .catch((err) => {
-        showToast((err && err.message) ? err.message : 'Failed to update SSN.', 'error');
-      })
-      .finally(() => {
-        setUpdateSsnLoading(false);
-      });
   const handleUpdateIdentity = async () => {
     if (!editingId.trim() || !editingName.trim()) {
       showToast('ID and Name are required.', 'error');
