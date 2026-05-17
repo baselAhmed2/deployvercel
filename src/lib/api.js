@@ -135,6 +135,12 @@ export const TicketAPI = {
       body: JSON.stringify(payload),
     });
   },
+  changeUserPassword(payload) {
+    return request('/api/Auth/change-password', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  },
   updateTicketStatus(ticketId, status) {
     return request(`/api/Tickets/${encodeURIComponent(ticketId)}/status`, {
       method: 'PUT',

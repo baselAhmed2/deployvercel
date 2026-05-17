@@ -1,6 +1,7 @@
 export const studentNav = [
   { href: '/student', label: 'Dashboard', icon: 'fas fa-th-large', end: true },
   { href: '/student/new-ticket', label: 'New Ticket', icon: 'fas fa-ticket-alt' },
+  { href: '/student/security', label: 'Security', icon: 'fas fa-shield-alt' },
   { href: '/', label: 'Logout', icon: 'fas fa-sign-out-alt', end: true, danger: true },
 ];
 
