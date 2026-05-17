@@ -21,6 +21,7 @@ export const adminNav = [
   { href: '/administrator/add-subject', label: 'Add Subject', icon: 'fas fa-book-open' },
   { href: '/administrator/add-course', label: 'Assign Subjects to Doctor', icon: 'fas fa-user-plus' },
   { href: '/administrator/analysis', label: 'Analysis', icon: 'fas fa-chart-bar' },
+  { href: '/administrator/security', label: 'Security', icon: 'fas fa-shield-alt' },
   { href: '/administrator/site-settings', label: 'Site Settings', icon: 'fas fa-cog' },
   { href: '/', label: 'Logout', icon: 'fas fa-sign-out-alt', end: true, danger: true },
 ];

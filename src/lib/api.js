@@ -298,6 +298,31 @@ export const TicketAPI = {
       body: JSON.stringify({ newPassword }),
     });
   },
+  resetAnyUserPassword(userId, newPassword) {
+    return request(`/api/Admin/users/${encodeURIComponent(userId)}/reset-password`, {
+      method: 'PUT',
+      body: JSON.stringify({ newPassword }),
+    });
+  },
+  updateStudentSsn(studentId, newSsn) {
+    return request(`/api/Admin/users/${encodeURIComponent(studentId)}/ssn`, {
+      method: 'PUT',
+      body: JSON.stringify({ newSsn }),
+    });
+  },
+  updateUserIdentity(userId, newId, newName) {
+    return request(`/api/Admin/users/${encodeURIComponent(userId)}/identity`, {
+      method: 'PUT',
+      body: JSON.stringify({ newId, newName }),
+    });
+  },
+  getSystemLogs({ pageIndex = 1, pageSize = 20, userIdFilter = '', actionType = '', search = '' } = {}) {
+    const params = new URLSearchParams({ pageIndex, pageSize });
+    if (userIdFilter) params.set('userIdFilter', userIdFilter);
+    if (actionType) params.set('actionType', actionType);
+    if (search) params.set('search', search);
+    return request(`/api/Admin/system-logs?${params}`);
+  },
   createUser(payload) {
     return this.createAdminUser(payload);
   },

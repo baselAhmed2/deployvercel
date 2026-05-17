@@ -31,6 +31,11 @@ export default function AdminUserDetail() {
   const [editingId, setEditingId] = useState('');
   const [editingName, setEditingName] = useState('');
   const [updateIdentityLoading, setUpdateIdentityLoading] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [resetPasswordLoading, setResetPasswordLoading] = useState(false);
+  
+  const userRole = typeof window !== 'undefined' ? localStorage.getItem('userRole') : null;
+  const isSuperAdmin = userRole === 'SuperAdmin';
 
   useEffect(() => {
     if (!id || typeof window.TicketAPI === 'undefined' || !window.TicketAPI.getAdminUserById) {
@@ -150,6 +155,39 @@ export default function AdminUserDetail() {
       });
   };
 
+  const handleResetPassword = () => {
+    if (!newPassword.trim() || newPassword.length < 6) {
+      showToast('Password must be at least 6 characters.', 'error');
+      return;
+    }
+
+    const doReset = window.TicketAPI?.resetAnyUserPassword
+      ? window.TicketAPI.resetAnyUserPassword(id, newPassword)
+      : fetch(`https://tiketapp-fagbbecbexf9f0ed.uaenorth-01.azurewebsites.net/api/Admin/users/${id}/reset-password`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({ newPassword })
+        }).then(async (res) => {
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || 'Failed to reset password');
+          return data;
+        });
+
+    setResetPasswordLoading(true);
+    doReset
+      .then(() => {
+        showToast('Password reset successfully.');
+        setNewPassword('');
+      })
+      .catch((err) => {
+        showToast((err && err.message) ? err.message : 'Failed to reset password.', 'error');
+      })
+      .finally(() => setResetPasswordLoading(false));
+  };
+
   return (
     <>
       <div className="toolbar-row" style={{ marginBottom: 20 }}>
@@ -205,14 +243,15 @@ export default function AdminUserDetail() {
               </button>
             </div>
             {role.toLowerCase() === 'student' && (
-              <div className="form-group">
+              <div className="form-group" style={{ gridColumn: '1 / -1' }}>
                 <label className="form-label">SSN (National ID)</label>
-                <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   <input 
                     type="text" 
                     className="form-input" 
                     value={ssn} 
                     onChange={(e) => setSsn(e.target.value)}
+                    style={{ flex: 1, minWidth: 200 }}
                   />
                   <button 
                     type="button" 
@@ -222,6 +261,31 @@ export default function AdminUserDetail() {
                     style={{ whiteSpace: 'nowrap' }}
                   >
                     {updateSsnLoading ? <i className="fas fa-spinner fa-spin"></i> : 'Update SSN'}
+                  </button>
+                </div>
+              </div>
+            )}
+            
+            {isSuperAdmin && (
+              <div className="form-group" style={{ gridColumn: '1 / -1', marginTop: 16, borderTop: '1px solid var(--border-color, #e2e8f0)', paddingTop: 16 }}>
+                <label className="form-label" style={{ color: '#dc3545' }}><i className="fas fa-key"></i> SuperAdmin: Reset Password</label>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <input 
+                    type="text" 
+                    className="form-input" 
+                    placeholder="New password (min 6 chars)"
+                    value={newPassword} 
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    style={{ flex: 1, minWidth: 200 }}
+                  />
+                  <button 
+                    type="button" 
+                    className="btn-primary" 
+                    disabled={resetPasswordLoading}
+                    onClick={handleResetPassword}
+                    style={{ whiteSpace: 'nowrap', background: '#dc3545' }}
+                  >
+                    {resetPasswordLoading ? <i className="fas fa-spinner fa-spin"></i> : 'Reset Password'}
                   </button>
                 </div>
               </div>
