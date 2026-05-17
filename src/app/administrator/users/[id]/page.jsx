@@ -118,43 +118,64 @@ export default function AdminUserDetail() {
       .finally(() => {
         setUpdateSsnLoading(false);
       });
-  const handleUpdateIdentity = () => {
+  const handleUpdateIdentity = async () => {
     if (!editingId.trim() || !editingName.trim()) {
       showToast('ID and Name are required.', 'error');
       return;
     }
 
-    const doUpdate = window.TicketAPI?.updateUserIdentity
-      ? window.TicketAPI.updateUserIdentity(id, editingId.trim(), editingName.trim(), editingProgram.trim())
-      : fetch(`https://tiketapp-fagbbecbexf9f0ed.uaenorth-01.azurewebsites.net/api/Admin/users/${id}/identity`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          body: JSON.stringify({ newId: editingId.trim(), newName: editingName.trim(), newProgram: editingProgram.trim() })
-        }).then(async (res) => {
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.message || 'Failed to update user identity');
-          return data;
-        });
-
     setUpdateIdentityLoading(true);
-    doUpdate
-      .then(() => {
-        showToast('User data updated successfully.');
-        if (editingId.trim() !== id) {
-            window.location.href = `/administrator/users/${editingId.trim()}`;
-        } else {
-            setUser((prev) => ({ ...prev, name: editingName.trim(), userName: editingId.trim(), program: editingProgram.trim() }));
-        }
-      })
-      .catch((err) => {
-        showToast((err && err.message) ? err.message : 'Failed to update user identity.', 'error');
-      })
-      .finally(() => {
-        setUpdateIdentityLoading(false);
-      });
+    
+    try {
+      // 1. Update Identity (ID, Name, Program)
+      const doUpdateIdentity = window.TicketAPI?.updateUserIdentity
+        ? window.TicketAPI.updateUserIdentity(id, editingId.trim(), editingName.trim(), editingProgram.trim())
+        : fetch(`https://tiketapp-fagbbecbexf9f0ed.uaenorth-01.azurewebsites.net/api/Admin/users/${id}/identity`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({ newId: editingId.trim(), newName: editingName.trim(), newProgram: editingProgram.trim() })
+          }).then(async (res) => {
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Failed to update user identity');
+            return data;
+          });
+
+      await doUpdateIdentity;
+
+      // 2. Update SSN if it's a student
+      if (role.toLowerCase() === 'student' && ssn !== (user.ssn ?? user.Ssn ?? user.SSN ?? '')) {
+        const doUpdateSsn = window.TicketAPI?.updateStudentSsn 
+          ? window.TicketAPI.updateStudentSsn(editingId.trim(), ssn.trim())
+          : fetch(`https://tiketapp-fagbbecbexf9f0ed.uaenorth-01.azurewebsites.net/api/Admin/users/${editingId.trim()}/ssn`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+              },
+              body: JSON.stringify({ newSsn: ssn.trim() })
+            }).then(async (res) => {
+              const data = await res.json();
+              if (!res.ok) throw new Error(data.message || 'Failed to update SSN');
+              return data;
+            });
+            
+        await doUpdateSsn;
+      }
+
+      showToast('User data updated successfully.');
+      if (editingId.trim() !== id) {
+          window.location.href = `/administrator/users/${editingId.trim()}`;
+      } else {
+          setUser((prev) => ({ ...prev, name: editingName.trim(), userName: editingId.trim(), program: editingProgram.trim(), ssn: ssn.trim() }));
+      }
+    } catch (err) {
+      showToast((err && err.message) ? err.message : 'Failed to update user data.', 'error');
+    } finally {
+      setUpdateIdentityLoading(false);
+    }
   };
 
   const handleResetPassword = () => {
@@ -239,39 +260,27 @@ export default function AdminUserDetail() {
                 onChange={(e) => setEditingProgram(e.target.value)}
               />
             </div>
+            {role.toLowerCase() === 'student' && (
+              <div className="form-group">
+                <label className="form-label">SSN (National ID)</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  value={ssn} 
+                  onChange={(e) => setSsn(e.target.value)}
+                />
+              </div>
+            )}
             <div className="form-group" style={{ gridColumn: '1 / -1' }}>
               <button 
                 type="button" 
                 className="btn-primary" 
-                disabled={updateIdentityLoading || (editingId === userName && editingName === name && editingProgram === program)}
+                disabled={updateIdentityLoading || (editingId === userName && editingName === name && editingProgram === program && ssn === (user.ssn ?? user.Ssn ?? user.SSN ?? ''))}
                 onClick={handleUpdateIdentity}
               >
                 {updateIdentityLoading ? <i className="fas fa-spinner fa-spin"></i> : 'Save User Data'}
               </button>
             </div>
-            {role.toLowerCase() === 'student' && isSuperAdmin && (
-              <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                <label className="form-label">SSN (National ID)</label>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  <input 
-                    type="text" 
-                    className="form-input" 
-                    value={ssn} 
-                    onChange={(e) => setSsn(e.target.value)}
-                    style={{ flex: 1, minWidth: 200 }}
-                  />
-                  <button 
-                    type="button" 
-                    className="btn-primary" 
-                    disabled={updateSsnLoading}
-                    onClick={handleUpdateSsn}
-                    style={{ whiteSpace: 'nowrap' }}
-                  >
-                    {updateSsnLoading ? <i className="fas fa-spinner fa-spin"></i> : 'Update SSN'}
-                  </button>
-                </div>
-              </div>
-            )}
             
             {isSuperAdmin && (
               <div className="form-group" style={{ gridColumn: '1 / -1', marginTop: 16, borderTop: '1px solid var(--border-color, #e2e8f0)', paddingTop: 16 }}>
